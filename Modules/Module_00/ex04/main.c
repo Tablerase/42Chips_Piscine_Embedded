@@ -84,7 +84,7 @@ void display_score(int score)
 	uint8_t res4 = (score & (1 << 3)) >> 3; // 1111 & 1000 >> 3 = 0001
 	uint8_t res3 = (score & (1 << 2)) >> 2; // 1111 & 0100 >> 2 = 0001
 	uint8_t res2 = (score & (1 << 1)) >> 1; // 1111 & 0010 >> 1 = 0001
-	uint8_t res1 = (score & (1 << 0)) >> 0; // 1111 & 0010 >> 0 = 0001
+	uint8_t res1 = (score & (1 << 0)) >> 0; // 1111 & 0001 >> 0 = 0001
 	led1_on(res1);
 	led2_on(res2);
 	led3_on(res3);

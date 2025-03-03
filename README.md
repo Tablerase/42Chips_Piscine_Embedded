@@ -161,30 +161,27 @@ flowchart LR
 
 ### Module 00
 
-- ex00: Write a program and make it run on the board
+- [Info - AVR Programming](https://www.instructables.com/AVR-Programming-with-Arduino-AVRdude-and-AVR-gcc/)
 
-  - [Info - AVR Programming](https://www.instructables.com/AVR-Programming-with-Arduino-AVRdude-and-AVR-gcc/)
+- Find the USB port
 
-    ```bash
-    # List all USB devices
-    lsusb
+  ```bash
+  # List all USB devices
+  lsusb
 
-    # List all USB serial devices
-    ls /dev/ttyUSB*
+  # List all USB serial devices
+  ls /dev/ttyUSB*
 
-    # Show detailed device information
-    dmesg | grep tty
-    ```
+  # Show detailed device information
+  dmesg | grep tty
+  ```
 
-- ex01: Write a program that makes the LED blink
+- Include the necessary libraries `<avr/io.h>`
+- PB0 is the LED pin here (same search for other pins)
 
-  - Include the necessary libraries `<avr/io.h>`
-  - PB0 is the LED pin here
-    - ICP1/CLKO/PCINT0 – Port B, Bit 0
-    - ICP1: Input Capture Pin. The PB0 pin can act as an Input Capture Pin for Timer/Counter1.
-    - CLKO: Divided System Clock. The divided system clock can be output on the PB0 pin. The divided system clock will be output if the CKOUT Fuse is programmed, regardless of the PORTB0 and DDB0 settings. It will also be output during reset.
-    - PCINT0: Pin Change Interrupt source 0. The PB0 pin can serve as an external interrupt
-      source.
-    - 📑 : Atmel ATmega328/P [DATASHEET] Atmel-42735B-ATmega328/P_Datasheet_Complete-11/2016 page 106)
-
-- ex02: Write a program that turns the light one when button pressed
+  - ICP1/CLKO/PCINT0 – Port B, Bit 0
+  - ICP1: Input Capture Pin. The PB0 pin can act as an Input Capture Pin for Timer/Counter1.
+  - CLKO: Divided System Clock. The divided system clock can be output on the PB0 pin. The divided system clock will be output if the CKOUT Fuse is programmed, regardless of the PORTB0 and DDB0 settings. It will also be output during reset.
+  - PCINT0: Pin Change Interrupt source 0. The PB0 pin can serve as an external interrupt
+    source.
+  - 📑 : Atmel ATmega328/P [DATASHEET] Atmel-42735B-ATmega328/P_Datasheet_Complete-11/2016 page 106)

@@ -1,0 +1,32 @@
+{
+  "configurations": [
+    {
+      "name": "linux-avr-gcc",
+      "includePath": ["${workspaceFolder}/**", "/usr/lib/avr/include/**"],
+      "defines": [],
+      "mergeConfigurations": false,
+      "compilerPath": "/usr/bin/avr-gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "gnu++14",
+      "intelliSenseMode": "linux-gcc-x64",
+      "compilerArgs": ["-mmcu=atmega328p", "-DF_CPU=16000000UL", "-Os"],
+      "browse": {
+        "path": ["${workspaceFolder}"],
+        "limitSymbolsToIncludedHeaders": true
+      }
+    },
+    {
+      "name": "linux-gcc-x64",
+      "includePath": ["/home/rcutte/Desktop/42Chips_Piscine_Embedded/**"],
+      "compilerPath": "/usr/bin/gcc",
+      "intelliSenseMode": "linux-gcc-x64",
+      "compilerArgs": [""],
+      "mergeConfigurations": false,
+      "browse": {
+        "path": ["${workspaceFolder}"],
+        "limitSymbolsToIncludedHeaders": true
+      }
+    }
+  ],
+  "version": 4
+}

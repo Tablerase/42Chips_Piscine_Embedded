@@ -1,6 +1,13 @@
 # Prerequisites
 *.d
 
+# Arduino files
+*.hex
+
+# ELF or binary
+*.elf
+*.bin
+
 # Compiled Object files
 *.slo
 *.lo

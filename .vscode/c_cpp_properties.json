@@ -17,7 +17,7 @@
     },
     {
       "name": "linux-gcc-x64",
-      "includePath": ["/home/rcutte/Desktop/42Chips_Piscine_Embedded/**"],
+      "includePath": ["${workspaceFolder}/**"],
       "compilerPath": "/usr/bin/gcc",
       "intelliSenseMode": "linux-gcc-x64",
       "compilerArgs": [""],

@@ -51,7 +51,6 @@ bool switch1_pressed(void)
 
 void update_light(bool *light_on)
 {
-	// TODO: Maybe update with better bounce detect
 	bool update_press = false;
 	// Stay in loop during button press
 	while (switch1_pressed())

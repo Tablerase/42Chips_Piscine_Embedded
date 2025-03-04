@@ -1,8 +1,3 @@
-###################### Program ######################
-
-# NAME = main.hex
-# all: $(NAME)
-
 ####################### FLAGS #######################
 
 MCU = atmega328p
@@ -19,18 +14,6 @@ BAUD_RATE = 115200
 PORT = /dev/ttyUSB0
 PROG_TYPE = arduino
 PROGRAMMER = -c $(PROG_TYPE) -p $(AVRDUDE_MCU) -P $(PORT) -b $(BAUD_RATE)
-
-####################### Libs ########################
-
-###################### Headers ######################
-# INC_PATH = ./include
-
-# INCLUDES = -I$(INC_PATH)
-
-# HEADERS_FILES = 
-
-# Headers files (rule to recompile if headers have changed)
-# HEADERS = $(addprefix $(INC_PATH)/,$(HEADERS_FILES))
 
 ###################### Sources ####################
 
@@ -62,18 +45,6 @@ fclean: clean
 
 re: fclean all
 
-# SRC_PATH = ./src
-
-# SRC = main.c \
-
-# OBJ = $(addprefix $(SRC_PATH)/,$(SRC:.c=.o))
-
-##################### Building ######################
-
-##################### Commands ######################
-
-####################### Tests ########################
-###################### Valgrind/Debug ######################
 ################### Special Target ###################
 
 .DEFAULT_GOAL := help

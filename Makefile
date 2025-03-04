@@ -1,3 +1,8 @@
+###################### Program ######################
+
+# NAME = main.hex
+# all: $(NAME)
+
 ####################### FLAGS #######################
 
 MCU = atmega328p
@@ -14,6 +19,18 @@ BAUD_RATE = 115200
 PORT = /dev/ttyUSB0
 PROG_TYPE = arduino
 PROGRAMMER = -c $(PROG_TYPE) -p $(AVRDUDE_MCU) -P $(PORT) -b $(BAUD_RATE)
+
+####################### Libs ########################
+
+###################### Headers ######################
+# INC_PATH = ./include
+
+# INCLUDES = -I$(INC_PATH)
+
+# HEADERS_FILES = 
+
+# Headers files (rule to recompile if headers have changed)
+# HEADERS = $(addprefix $(INC_PATH)/,$(HEADERS_FILES))
 
 ###################### Sources ####################
 
@@ -45,6 +62,18 @@ fclean: clean
 
 re: fclean all
 
+# SRC_PATH = ./src
+
+# SRC = main.c \
+
+# OBJ = $(addprefix $(SRC_PATH)/,$(SRC:.c=.o))
+
+##################### Building ######################
+
+##################### Commands ######################
+
+####################### Tests ########################
+###################### Valgrind/Debug ######################
 ################### Special Target ###################
 
 .DEFAULT_GOAL := help
@@ -55,7 +84,7 @@ help:
 	@echo "  make [target]"
 	@echo ""
 	@echo "$(BOLD)Targets:$(RESET)"
-	@echo "  $(C_EXEC)all$(RESET)		Build the program and upload it to the board"
+	@echo "  $(C_EXEC)all$(RESET)		Build and flash the program"
 	@echo "  $(C_ARCHIVED)clean$(RESET)		Remove object files"
 	@echo "  $(C_ARCHIVED)fclean$(RESET)	Remove object files and the program"
 	@echo "  $(C_ARCHIVED)re$(RESET)		Rebuild the program"

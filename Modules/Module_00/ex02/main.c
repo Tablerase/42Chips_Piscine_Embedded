@@ -37,6 +37,7 @@ bool button_is_pressed(void)
 
 	// Set button PD2 to read
 	DDRD |= (0 << DDD2);
+	// Activate the resistance
 	PORTD |= (1 << PORTD2);
 	// Listen to input status
 	if ((PIND & (1 << PIND2)) == 0)

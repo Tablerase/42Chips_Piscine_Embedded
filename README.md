@@ -5,6 +5,7 @@
 ## Resources
 
 - [AVR-Microcontroller-ATmega328P](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf)
+- [Calculator](https://www.rapidtables.com/convert/number/decimal-to-binary.html?x=16)
 
 ## Config
 
@@ -66,11 +67,7 @@ flowchart LR
   - `-O ihex` specifies the output format as Intel HEX
   - `-R .eeprom` removes the EEPROM data from the HEX file
     - EEPROM (Electrically Erasable Programmable Read-Only Memory) is a type of non-volatile memory used in computers and other electronic devices to store small amounts of data that must be saved when power is removed
-- `avrdude` is a utility program that allows you to download/upload/manipulate the ROM and EEPROM contents of AVR microcontrollers
-  - `-c` specifies the programmer type
-  - `-b` specifies the baud rate
-  - `-p` specifies the microcontroller model
-  - `-P` specifies the port
+- `avrdude` is a utility program that ahttps://www.rapidtables.com/convert/number/decimal-to-binary.html?x=16
 
 #### AVR Libraries
 
@@ -155,7 +152,179 @@ flowchart LR
   - Bit n reads the state of pin n
 
 [DDR-PORT-PIN](http://embeddedwithanshul.blogspot.com/2012/06/registers-ddr-port-pin.html)
+
+### Logic Gates
+
+- [Logic Gate](https://en.wikipedia.org/wiki/Logic_gate)
+- [Logic Gate - Simulator](https://logic.ly/demo)
+
+#### Flip-Flop
+
+- [Flip-Flop - Wiki](<https://en.wikipedia.org/wiki/Flip-flop_(electronics)>)
+- [Flip-Flop - Detailled - T,D,JK](https://www.electronicsforu.com/technology-trends/learn-electronics/flip-flop-rs-jk-t-d)
+- JK Flip-Flop
+  <img src="https://www.electronics-tutorials.ws/wp-content/uploads/2018/05/sequential-seq13.gif" align="right" width="300px" />
+
+  -
+  - Truth table:
+    | J | K | Q(t) | Q(t+1) | Comment |
+    |---|---|------|--------| ------- |
+    | 0 | 0 | Q | Q | No change |
+    | 0 | 1 | Q | 0 | Reset |
+    | 1 | 0 | Q | 1 | Set |
+    | 1 | 1 | Q | !Q | Toggle |
+
+- T Flip-Flop
+  <img src="https://www.electronicsforu.com/wp-contents/uploads/2019/04/t-flip-flop-1-500x266.jpg" align="right" width="300px" alt="t flip flop"/>
+
+  - Truth table:
+    | T | Q(t) | Q(t+1) | Comment |
+    |---|------|--------| ------- |
+    | 0 | Q | Q | No change |
+    | 1 | Q | !Q | Toggle |
+
+- D Flip-Flop
+  <img src="https://www.electronicsforu.com/wp-contents/uploads/2017/08/d-flip-flop.png" align="right" width="300px" alt="d flip flop" />
+  - Truth table:
+    | D | Q(t) | Q(t+1) | Comment |
+    |---|------|--------| ------- |
+    | 0 | Q | 0 | Reset |
+    | 1 | Q | 1 | Set |
+
+## Bitwise Operations
+
 [BitWise op in embedded programming](https://binaryupdates.com/bitwise-operations-in-embedded-programming/)
+
+| Operation   | Symbol | Purpose                | Description                     | Example             |
+| ----------- | ------ | ---------------------- | ------------------------------- | ------------------- |
+| AND         | &      | Compare bits           | returns 1 if both bits are 1    | 1010 & 1100 = 1000  |
+| OR          | \|     | Set bits               | returns 1 if any bit is 1       | 1010 \| 1100 = 1110 |
+| XOR         | ^      | Toggle bits            | returns 1 if bits are different | 1010 ^ 1100 = 0110  |
+| NOT         | ~      | Invert bits            | returns 1 if bit is 0           | ~1010 = 0101        |
+| Left Shift  | <<     | Multiply by power of 2 | moves bits to the left          | 1010 << 1 = 10100   |
+| Right Shift | >>     | Divide by power of 2   | moves bits to the right         | 1010 >> 1 = 0101    |
+
+### Bit manipulation
+
+<table>
+  <thead>
+    <tr>
+      <th>Pattern</th>
+      <th>Description</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>1 << n</code></td>
+      <td>Mask Set bit n</td>
+      <td>
+      
+```c
+n = 3
+1 << 3 = 00001000
+```
+</td>
+    </tr>
+    <tr>
+      <td><code>~(1 << n)</code></td>
+      <td>Mask Clear bit n</td>
+      <td>
+
+```c
+n = 3
+~(1 << 3) = 11110111
+```
+
+</td>
+    </tr>
+    <tr>
+      <td><code>x & (1 << n)</code></td>
+      <td>Check bit n</td>
+      <td>
+
+```c
+x = 1010
+n = 3
+x & (1 << 3)
+1010 & 1000 = 1000
+```
+
+</td>
+    </tr>
+    <tr>
+      <td><code>x | (1 << n)</code></td>
+      <td>Set bit n</td>
+      <td>
+
+```c
+x = 1010
+n = 2
+x | (1 << 2)
+1010 | 0100 = 1110
+```
+
+</td>
+    </tr>
+    <tr>
+      <td><code>x & ~(1 << n)</code></td>
+      <td>Clear bit n</td>
+      <td>
+
+```c
+x = 1010
+n = 1
+x & ~(1 << 1)
+1010 & 1101 = 1000
+```
+
+</td>
+    </tr>
+    <tr>
+      <td><code>x ^ (1 << n)</code></td>
+      <td>Toggle bit n</td>
+      <td>
+
+```c
+x = 1010
+n = 1
+x ^ (1 << 1)
+1010 ^ 0010 = 1000
+```
+
+</td>
+    </tr>
+    <tr>
+      <td><code>x & ((1 << n) - 1)</code></td>
+      <td>Clear bits above n</td>
+      <td>
+
+```c
+x = 1110
+n = 2
+x & ((1 << 2) - 1)
+1110 & (0100 - 1) = 1110 & 0011 = 0010
+```
+
+</td>
+    </tr>
+    <tr>
+      <td><code>x & ~((1 << n) - 1)</code></td>
+      <td>Clear bits below n</td>
+      <td><code>x & ~((1 << 3) - 1)</code></td>
+    </tr>
+    <tr>
+      <td><code>x & ((1 << (n + 1)) - 1)</code></td>
+      <td>Clear bits above and including n</td>
+      <td><code>x & ((1 << (3 + 1)) - 1)</code></td>
+    </tr>
+    <tr>
+      <td><code>x & ~((1 << (n + 1)) - 1)</code></td>
+      <td>Clear bits below and including n</td>
+      <td><code>x & ~((1 << (3 + 1)) - 1)</code></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Modules
 
@@ -185,3 +354,43 @@ flowchart LR
   - PCINT0: Pin Change Interrupt source 0. The PB0 pin can serve as an external interrupt
     source.
   - 📑 : Atmel ATmega328/P [DATASHEET] Atmel-42735B-ATmega328/P_Datasheet_Complete-11/2016 page 106)
+
+### Module 01
+
+Infos about frequency and time:
+
+- `1Hz` = 1s = 1000ms
+  - `1kHz` = 1,000Hz = 1ms
+  - `1MHz` = 1,000,000Hz = 1µs
+- `1 tick` = One cycle of the system clock
+  - For a 16MHz Clock = 16,000,000 ticks per second
+  - 1 tick = 1 / 16,000,000 seconds = 0.0625µs = 62.5ns
+  - 1 tick = around 1-2 instructions
+- **Clock** counter
+  - Different counters have different maximum values
+    - 8-bit counter = 256 ticks
+    - 16-bit counter = 65,536 ticks
+  - So using prescaling is important to avoid overflow
+- Prescaling: Allow to skip a certain number of ticks
+  - **Prescaler** values: `1, 8, 64, 256, 1024` (AVR Microcontrollers)
+  - Example:
+    - 16MHz / 1 = 16,000,000Hz
+    - 16MHz / 8 = 2,000,000Hz
+    - 16MHz / 64 = 250,000Hz
+    - 16MHz / 256 = 62,500Hz
+    - 16MHz / 1024 = 15,625Hz
+
+Applying in code :
+
+- [Microcontrollers - Timers Counters - Instructables](https://www.instructables.com/Beginning-Microcontrollers-Part-11-Timers-Counters/)
+- [Builtin AVR Functions - GNU GCC Docs](https://gcc.gnu.org/onlinedocs/gcc/AVR-Built-in-Functions.html)
+- `__builtin_avr_delay_cycles`
+  - `void __builtin_avr_delay_cycles (uint32_t ticks)`
+  - Delays the specified number of CPU cycles.
+  - The delay parameter is a constant unsigned long integer, which specifies the number of CPU cycles to delay.
+  - The delay parameter must be a compile-time constant.
+  - The delay parameter must be greater than or equal to 1.
+  - The delay parameter must be less than or equal to 65535.
+  - The delay parameter is rounded up to the nearest multiple of 3.
+  - The delay parameter is divided by 3 to determine the number of NOP instructions to insert.
+    - The NOP instruction is a single-cycle instruction that does nothing.

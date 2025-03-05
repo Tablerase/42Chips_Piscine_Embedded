@@ -10,6 +10,26 @@
 // Cycles / Count = 1 s / 64 us = 15625
 
 #define TARGET_COUNT 15625
+#define CYCLE_10p 1562
+
+void set_duty_cycle(uint8_t duty)
+{
+	// Waveform Generation Mode (WGM)
+	// Control counting sequence and waveform generation based on count
+
+	// Fast PWM
+	// Mode 14 : TOP -> ICR1
+	// Mode 14 = WGM13(1), WGM12(1), WGM11(1)
+	TCCR1B |= (1 << WGM13);
+	TCCR1B |= (1 << WGM12);
+	TCCR1A |= (1 << WGM11);
+
+	// Set TOP value of Counter for Clock Frequency
+	ICR1 = TARGET_COUNT;
+	// Set duty cycle compare
+	// OCR1A = (TARGET_COUNT * duty) / 100; // duty is a percentage (0-100)
+	OCR1A = TARGET_COUNT * 0.10;
+}
 
 void setup()
 {
@@ -23,22 +43,12 @@ void setup()
 	TCCR1B |= (1 << CS10);
 	TCCR1B |= (1 << CS12);
 
-	// TCNT1 - Timer CouNter of Timer 1
-	// Compare with Output Compare Reg A of Timer 1 (OCR1A)
-	OCR1A = TARGET_COUNT;
-
 	// Compare Output Mode (COM)
 	// OC1A on TCCR1 reg A
 	// Toggle Mode for OC1A on Compare Match with COM1A0
 	// When OCR1A is reached toggle bit on OC1A (here LED D2)
 	TCCR1A |= 1 << COM1A0;
-
-	// Waveform Generation Mode (WGM)
-	// Control counting sequence and waveform generation based on count
-	// Here we want to clear the count at compare match
-	// Mode: Clear Timer on Compare match (CTC)
-	// Here CTC for OCR1A is 1 on WGM12 with Register B
-	TCCR1B |= 1 << WGM12;
+	set_duty_cycle(20);
 }
 
 int main()

@@ -7,21 +7,9 @@
       "mergeConfigurations": false,
       "compilerPath": "/usr/bin/avr-gcc",
       "cStandard": "gnu11",
-      "cppStandard": "gnu++14",
+      "cppStandard": "gnu++17",
       "intelliSenseMode": "linux-gcc-x64",
       "compilerArgs": ["-mmcu=atmega328p", "-DF_CPU=16000000UL", "-Os"],
-      "browse": {
-        "path": ["${workspaceFolder}"],
-        "limitSymbolsToIncludedHeaders": true
-      }
-    },
-    {
-      "name": "linux-gcc-x64",
-      "includePath": ["${workspaceFolder}/**"],
-      "compilerPath": "/usr/bin/gcc",
-      "intelliSenseMode": "linux-gcc-x64",
-      "compilerArgs": [""],
-      "mergeConfigurations": false,
       "browse": {
         "path": ["${workspaceFolder}"],
         "limitSymbolsToIncludedHeaders": true

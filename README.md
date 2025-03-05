@@ -11,10 +11,33 @@
 
 ### VSCode
 
-- [C/C++ config]
+- [C/C++ Config]
 
 ```vscode
 @ext:ms-vscode.cpptools
+```
+
+```json
+{
+  "configurations": [
+    {
+      "name": "linux-avr-gcc",
+      "includePath": ["${workspaceFolder}/**", "/usr/lib/avr/include/**"],
+      "defines": [],
+      "mergeConfigurations": false,
+      "compilerPath": "/usr/bin/avr-gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "gnu++17",
+      "intelliSenseMode": "linux-gcc-x64",
+      "compilerArgs": ["-mmcu=atmega328p", "-DF_CPU=16000000UL", "-Os"],
+      "browse": {
+        "path": ["${workspaceFolder}"],
+        "limitSymbolsToIncludedHeaders": true
+      }
+    }
+  ],
+  "version": 4
+}
 ```
 
 ## Information
@@ -152,6 +175,165 @@ flowchart LR
   - Bit n reads the state of pin n
 
 [DDR-PORT-PIN](http://embeddedwithanshul.blogspot.com/2012/06/registers-ddr-port-pin.html)
+
+#### AVR Timers
+
+- Timers are used to generate precise time delays, measure time intervals, and control the frequency of waveforms
+- Timers are implemented using Timer/Counter Registers
+  - Timer/Counter Registers are memory locations that control the behavior of the timers
+  - Timer/Counter Registers are used to configure the timers, read the current count value, and write new count values
+
+##### Timer/Counter Registers
+
+| Register | Description                  | Address | Bit 7  | Bit 6  | Bit 5  | Bit 4  | Bit 3  | Bit 2  | Bit 1  | Bit 0  |
+| -------- | ---------------------------- | ------- | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| TCCRnA   | Timer/Counter Control Reg A  | 0x2n    | COMnA1 | COMnA0 | COMnB1 | COMnB0 | -      | -      | WGMn1  | WGMn0  |
+| TCCRnB   | Timer/Counter Control Reg B  | 0x2n+1  | FOCnA  | FOCnB  | -      | -      | WGMn2  | CSn2   | CSn1   | CSn0   |
+| TCNTn    | Timer/Counter Register       | 0x2n+2  | TCNTn7 | TCNTn6 | TCNTn5 | TCNTn4 | TCNTn3 | TCNTn2 | TCNTn1 | TCNTn0 |
+| OCRnA    | Output Compare Reg A         | 0x2n+3  | OCRnA7 | OCRnA6 | OCRnA5 | OCRnA4 | OCRnA3 | OCRnA2 | OCRnA1 | OCRnA0 |
+| OCRnB    | Output Compare Reg B         | 0x2n+4  | OCRnB7 | OCRnB6 | OCRnB5 | OCRnB4 | OCRnB3 | OCRnB2 | OCRnB1 | OCRnB0 |
+| ICRn     | Input Capture Register       | 0x2n+4  | ICRn7  | ICRn6  | ICRn5  | ICRn4  | ICRn3  | ICRn2  | ICRn1  | ICRn0  |
+| TIFRn    | Timer/Counter Interrupt Flag | 0x3n    | -      | -      | -      | -      | -      | -      | OCFnA  | OCFnB  |
+
+- `n` is the timer number (e.g., Timer0, Timer1, Timer2)
+- `COMnA1` and `COMnA0` control the output behavior of the `OCnA` pin
+- `COMnB1` and `COMnB0` control the output behavior of the `OCnB` pin
+- `WGMn2`, `WGMn1`, and `WGMn0` control the waveform generation mode
+- `FOCnA` and `FOCnB` are used to force an output compare match
+- `CSn2`, `CSn1`, and `CSn0` control the clock source
+- `TCNTn` is the timer/counter register that holds the current count value
+- `OCRnA` and `OCRnB` are the output compare registers that hold the comparison values
+- `ICRn` is the input capture register that holds the capture value
+- `OCFnA` and `OCFnB` are the output compare match flags
+
+###### Prescaler
+
+- The prescaler is a counter that divides the clock frequency before it reaches the timer
+- The prescaler is used to reduce the clock frequency to a manageable level
+
+  - This allows the timer to count at a slower rate
+  - This prevents the timer from overflowing too quickly
+    - Example: Timer1 is an 16-bit counter that can count up to $2^{16} = 65,536$
+      - $F_{timer} = \frac{System\ clock}{Prescaler}$
+      - $F_{timer} = \frac{16\ \text{MHz}}{1024} = 15.625\ \text{KHz}$
+      - $T_{tick} = \frac{1}{15.625\ \text{KHz}} = 64\ \mu s$
+      - $T_{total} = 64\mu s \times 65,536 = 4.194\ \text{s}$
+      - The timer will overflow every 4.194 seconds
+
+- The prescaler is controlled by the CSn2, CSn1, and CSn0 bits in the TCCRnB register
+
+| CSn2 | CSn1 | CSn0 | Prescaler | Description      |
+| ---- | ---- | ---- | --------- | ---------------- |
+| 0    | 0    | 0    | 0         | No prescaling    |
+| 0    | 0    | 0    | 1         | $clk_{I/O}$      |
+| 0    | 0    | 1    | 8         | $clk_{I/O}$/8    |
+| 0    | 1    | 0    | 64        | $clk_{I/O}$/64   |
+| 0    | 1    | 1    | 256       | $clk_{I/O}$/256  |
+| 1    | 0    | 0    | 1024      | $clk_{I/O}$/1024 |
+
+```mermaid
+flowchart TB
+    subgraph "Timer Configuration"
+        TCCR["TCCRnA/B Registers<br/><i>Control Settings</i>"]
+    end
+
+    subgraph "Timer Counter"
+        TCNT["TCNTn Register<br/><i>Counter Value</i>"]
+    end
+
+    subgraph "Output Compare"
+        OCR["OCRnA/B Registers<br/><i>Comparison Value</i>"]
+    end
+
+    subgraph "Input Capture"
+        ICR["ICRn Register<br/><i>Capture Value</i>"]
+    end
+
+    subgraph "Interrupt Flags"
+        TIFR["TIFRn Register<br/><i>Interrupt Flags</i>"]
+    end
+
+    TCCR --> |"Control"| TCNT
+    TCCR --> |"Control"| OCR
+    TCCR --> |"Control"| ICR
+    TCCR --> |"Control"| TIFR
+
+    style TCCR fill:#ffcdd2,stroke:#c62828,color:#000000
+    style TCNT fill:#bbdefb,stroke:#1976d2,color:#000000
+    style OCR fill:#c8e6c9,stroke:#388e3c,color:#000000
+    style ICR fill:#dcedc8,stroke:#689f38,color:#000000
+    style TIFR fill:#f0f4c3,stroke:#afb42b,color:#000000
+```
+
+##### Waveform Generation Modes
+
+- The waveform generation mode is controlled by the WGMn2, WGMn1
+  , and WGMn0 bits in the TCCRnA and TCCRnB registers
+- The waveform generation mode determines how the timer counts and when it overflows
+- There are several waveform generation modes available
+  - Normal Mode
+  - CTC (Clear Timer on Compare Match) Mode
+  - Fast PWM Mode
+  - Phase Correct PWM Mode
+- PWM: Pulse Width Modulation
+  - PWM is a technique used to generate analog-like signals using digital outputs
+  - The frequency of the signal is controlled by changing the period of the pulse
+
+```mermaid
+flowchart TB
+    subgraph "Waveform Generation Modes"
+        WGM["WGMn2/1/0 Bits<br/><i>Waveform Mode</i>"]
+    end
+
+    subgraph "Normal Mode"
+        NM["Normal Mode<br/><i>Overflow at MAX</i>"]
+    end
+
+    subgraph "CTC Mode"
+        CTC["CTC Mode<br/><i>Clear on Compare Match</i>"]
+    end
+
+    subgraph "Fast PWM Mode"
+        FPM["Fast PWM Mode<br/><i>Non-inverting</i>"]
+    end
+
+    subgraph "Phase Correct PWM Mode"
+        PCP["Phase Correct PWM Mode<br/><i>Symmetrical</i>"]
+    end
+
+    WGM --> |"Control"| NM
+    WGM --> |"Control"| CTC
+    WGM --> |"Control"| FPM
+    WGM --> |"Control"| PCP
+
+    style WGM fill:#ffcdd2,stroke:#c62828,color:#000000
+    style NM fill:#bbdefb,stroke:#1976d2,color:#000000
+    style CTC fill:#c8e6c9,stroke:#388e3c,color:#000000
+    style FPM fill:#dcedc8,stroke:#689f38,color:#000000
+    style PCP fill:#f0f4c3,stroke:#afb42b,color:#000000
+```
+
+- Normal Mode
+  - The timer counts from 0 to 255 (8-bit) or 65,535 (16-bit) and then overflows
+  - The timer overflows when it reaches the maximum count value
+  - The timer is reset to 0 after overflowing
+- CTC Mode
+  - The timer counts from 0 to a comparison value and then resets
+  - The timer resets when it reaches the comparison value
+  - The timer is reset to 0 after resetting
+    <img src="https://wolles-elektronikkiste.de/wp-content/uploads/2020/12/F_PWM_vs_PandF_correct_Grafic-1024x578.png" align="right" width="400px" alt="Fast PWM vs Phase Correct PWM" />
+- Fast PWM Mode
+  - The timer counts from 0 to 255 (8-bit) or 65,535 (16-bit) and then overflows
+  - The timer overflows when it reaches the maximum count value
+  - The timer is reset to 0 after overflowing
+  - The output pin is set high when the timer is less than the comparison value
+  - The output pin is set low when the timer is greater than the comparison value
+- Phase Correct PWM Mode
+  - The timer counts up to the comparison value and then counts down to 0
+  - The timer counts up when the timer is less than the comparison value
+  - The timer counts down when the timer is greater than the comparison value
+  - The output pin is set high when the timer is less than the comparison value
+  - The output pin is set low when the timer is greater than the comparison value
 
 ### Logic Gates
 
@@ -380,17 +562,38 @@ Infos about frequency and time:
     - 16MHz / 256 = 62,500Hz
     - 16MHz / 1024 = 15,625Hz
 
-Applying in code :
+Delay in code :
 
 - [Microcontrollers - Timers Counters - Instructables](https://www.instructables.com/Beginning-Microcontrollers-Part-11-Timers-Counters/)
 - [Builtin AVR Functions - GNU GCC Docs](https://gcc.gnu.org/onlinedocs/gcc/AVR-Built-in-Functions.html)
 - `__builtin_avr_delay_cycles`
+
   - `void __builtin_avr_delay_cycles (uint32_t ticks)`
   - Delays the specified number of CPU cycles.
-  - The delay parameter is a constant unsigned long integer, which specifies the number of CPU cycles to delay.
   - The delay parameter must be a compile-time constant.
-  - The delay parameter must be greater than or equal to 1.
-  - The delay parameter must be less than or equal to 65535.
-  - The delay parameter is rounded up to the nearest multiple of 3.
-  - The delay parameter is divided by 3 to determine the number of NOP instructions to insert.
-    - The NOP instruction is a single-cycle instruction that does nothing.
+
+Timer registers:
+
+- [AVR - Timer programming - ExploreEmbedded](https://exploreembedded.com/wiki/AVR_Timer_programming)
+
+<img src="./Media/Timer/Timer1 - OC1A - LED D2 - 1Hz.png" alt="Ex01 - 1Hz - LED D2 (OC1A)" />
+
+- LED at 1Hz = 1s
+
+  - $F_{timer} = \frac{F_{CPU}}{Prescaler}$
+  - $F_{timer} = \frac{16\ \text{MHz}}{1024} = 15.625\ \text{KHz}$
+  - $T_{tick} = \frac{1}{15.625\ \text{KHz}} = 64\ \mu s$
+  - $Cycles/Count = \frac{Wait\ Time}{T_{tick}} = \frac{1\ s}{64\ \mu s} = 15625$
+
+- Duty Cycle
+
+  - Pulse Width(PW) to Total period (T) of the Waveform/Signal
+    - Generally expressed in percentage
+    - Represents the amount of time the signal is high(1) compared to the total time
+  - $Duty\ Cycle = \frac{PW}{T} $
+  - $Duty\ Cycle = \frac{ON\ Time}{Total\ Time} = \frac{ON\ Time}{ON\ Time + OFF\ Time}$
+    - $Duty\ Cycle = \frac{1\ s}{1\ s + 1\ s} = 50\%$
+
+- $F_{desired} = \frac{F_{CPU}}{Prescaler \times (1 + TOP)}$
+  - $TOP = \frac{F_{CPU}}{F_{desired} \times Prescaler} - 1$
+  - $TOP = \frac{16\ \text{MHz}}{1\ \text{Hz} \times 1024} - 1 = 15624$

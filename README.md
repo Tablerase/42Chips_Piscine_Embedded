@@ -336,6 +336,48 @@ flowchart TB
   - The output pin is set high when the timer is less than the comparison value
   - The output pin is set low when the timer is greater than the comparison value
 
+#### UART Protocol
+
+- [UART - Wiki](https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter)
+- [UART - Understanding](https://www.rohde-schwarz.com/us/products/test-and-measurement/essentials-test-equipment/digital-oscilloscopes/understanding-uart_254524.html)
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/UART_block_diagram.svg/1280px-UART_block_diagram.svg.png" align="right" width="300px" alt="UART Block Diagram" />
+
+- UART (**Universal Asynchronous Receiver/Transmitter**) is a serial communication protocol used to transfer data between devices
+- UART is asynchronous, meaning that the data is transmitted without a clock signal
+- UART uses two pins: **TX (Transmit) and RX (Receive)**
+- UART data is transmitted one bit at a time, **starting with the least significant bit (LSB)**
+- UART data is transmitted in frames, with each frame consisting of a start bit, data bits, parity bit, and stop bit
+
+```mermaid
+---
+title: UART Frame
+bitsPerWidth: 12
+---
+packet-beta
+0-1: "Idle"
+2: "Start"
+3-12: "Data Bits (5 to 9 bits)"
+13: "Parity"
+14-15: "Stop"
+```
+
+- The start bit signals the beginning of the frame
+- The data bits contain the actual data being transmitted
+- The parity bit is used for error checking
+- The stop bit signals the end of the frame
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/UART-signal.png/1920px-UART-signal.png" alt="UART Signal" />
+
+- The baud rate is important for UART communication
+  - The baud rate is the number of bits transmitted per second
+  - The baud rate determines the speed of the communication
+  - The baud rate must be the **same on both the transmitter and receiver**
+- The baud rate is calculated as follows:
+  - $Baud\ Rate = \frac{Clock\ Frequency}{16 \times (UBRRn + 1)}$
+  - $UBRRn = \frac{Clock\ Frequency}{16 \times Baud\ Rate} - 1$
+    - $UBRRn$ is the UART Baud Rate Register
+
 ### Logic Gates
 
 - [Logic Gate](https://en.wikipedia.org/wiki/Logic_gate)
@@ -584,8 +626,8 @@ Timer registers:
   - $F_{timer} = \frac{F_{CPU}}{Prescaler}$
   - $F_{timer} = \frac{16\ \text{MHz}}{1024} = 15.625\ \text{KHz}$
   - $T_{tick} = \frac{1}{15.625\ \text{KHz}} = 64\ \mu s$
+  - $Cycles/Count = \frac{Wait\ Time}{T_{tick}} = \frac{1\ s}{64\ \mu s} = 15625$
   - $Cycles/Count = \frac{Wait\ Time}{T_{tick}} = \frac{0.5\ s}{64\ \mu s} = 7812.5$
-  - $Cycles/Count = 7812$
 
 - Duty Cycle
 
@@ -599,7 +641,15 @@ Timer registers:
 - $F_{desired} = \frac{F_{CPU}}{Prescaler \times (1 + TOP)}$
   - $TOP = \frac{F_{CPU}}{F_{desired} \times Prescaler} - 1$
   - $TOP = \frac{16\ \text{MHz}}{1\ \text{Hz} \times 1024} - 1 = 15624$
+    - $-1$ because the counter starts from 0
 
 <img src="./Media/Timer/Timer1 - OC1A - LED D2 - 1Hz - 10_.png" alt="Ex01 - 1Hz - 10% - LED D2 (OC1A)" />
 
-### Module 02
+### Module02: UART Protocol
+
+```bash
+# Listen to the serial port (ttyUSB0) with baud rate 115200
+screen /dev/ttyUSB0 115200
+```
+
+[UART - AVR - Guide for use](http://www.rjhcoding.com/avrc-uart.php)

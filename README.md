@@ -5,6 +5,7 @@
 ## Resources
 
 - [AVR-Microcontroller-ATmega328P](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf)
+  - [ATmega328P - Summary](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e58732)
 - [Calculator](https://www.rapidtables.com/convert/number/decimal-to-binary.html?x=16)
 
 ## Config
@@ -12,33 +13,33 @@
 ### VSCode
 
 - [C/C++ Config]
-
-```vscode
-@ext:ms-vscode.cpptools
-```
-
-```json
-{
-  "configurations": [
-    {
-      "name": "linux-avr-gcc",
-      "includePath": ["${workspaceFolder}/**", "/usr/lib/avr/include/**"],
-      "defines": [],
-      "mergeConfigurations": false,
-      "compilerPath": "/usr/bin/avr-gcc",
-      "cStandard": "gnu11",
-      "cppStandard": "gnu++17",
-      "intelliSenseMode": "linux-gcc-x64",
-      "compilerArgs": ["-mmcu=atmega328p", "-DF_CPU=16000000UL", "-Os"],
-      "browse": {
-        "path": ["${workspaceFolder}"],
-        "limitSymbolsToIncludedHeaders": true
+  - Extension (ms-vscode.cpptools)
+  ```vscode
+  @ext:ms-vscode.cpptools
+  ```
+  - `c_cpp_properties.json`
+  ```json
+  {
+    "configurations": [
+      {
+        "name": "linux-avr-gcc",
+        "includePath": ["${workspaceFolder}/**", "/usr/lib/avr/include/**"],
+        "defines": [],
+        "mergeConfigurations": false,
+        "compilerPath": "/usr/bin/avr-gcc",
+        "cStandard": "gnu11",
+        "cppStandard": "gnu++17",
+        "intelliSenseMode": "linux-gcc-x64",
+        "compilerArgs": ["-mmcu=atmega328p", "-DF_CPU=16000000UL", "-Os"],
+        "browse": {
+          "path": ["${workspaceFolder}"],
+          "limitSymbolsToIncludedHeaders": true
+        }
       }
-    }
-  ],
-  "version": 4
-}
-```
+    ],
+    "version": 4
+  }
+  ```
 
 ## Information
 
@@ -578,12 +579,13 @@ Timer registers:
 
 <img src="./Media/Timer/Timer1 - OC1A - LED D2 - 1Hz.png" alt="Ex01 - 1Hz - LED D2 (OC1A)" />
 
-- LED at 1Hz = 1s
+- LED at 1Hz = 1s (0.5s ON, 0.5s OFF)
 
   - $F_{timer} = \frac{F_{CPU}}{Prescaler}$
   - $F_{timer} = \frac{16\ \text{MHz}}{1024} = 15.625\ \text{KHz}$
   - $T_{tick} = \frac{1}{15.625\ \text{KHz}} = 64\ \mu s$
-  - $Cycles/Count = \frac{Wait\ Time}{T_{tick}} = \frac{1\ s}{64\ \mu s} = 15625$
+  - $Cycles/Count = \frac{Wait\ Time}{T_{tick}} = \frac{0.5\ s}{64\ \mu s} = 7812.5$
+  - $Cycles/Count = 7812$
 
 - Duty Cycle
 
@@ -592,8 +594,12 @@ Timer registers:
     - Represents the amount of time the signal is high(1) compared to the total time
   - $Duty\ Cycle = \frac{PW}{T} $
   - $Duty\ Cycle = \frac{ON\ Time}{Total\ Time} = \frac{ON\ Time}{ON\ Time + OFF\ Time}$
-    - $Duty\ Cycle = \frac{1\ s}{1\ s + 1\ s} = 50\%$
+    - $Duty\ Cycle = \frac{1\ s}{1\ s + 1\ s} = 50\ \%$
 
 - $F_{desired} = \frac{F_{CPU}}{Prescaler \times (1 + TOP)}$
   - $TOP = \frac{F_{CPU}}{F_{desired} \times Prescaler} - 1$
   - $TOP = \frac{16\ \text{MHz}}{1\ \text{Hz} \times 1024} - 1 = 15624$
+
+<img src="./Media/Timer/Timer1 - OC1A - LED D2 - 1Hz - 10_.png" alt="Ex01 - 1Hz - 10% - LED D2 (OC1A)" />
+
+### Module 02

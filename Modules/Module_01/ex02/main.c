@@ -7,10 +7,11 @@
 // System Clock : 16MHz
 // Frequency = 16MHz / 1024 -> 15.625 KHz
 // Ttick = 1 / 15.625 KHz = 64 us
-// Cycles / Count = 1 s / 64 us = 15625
+// Cycles / Count = 1 s / 64 us = 15625 - 1
+// 1Hz = 15624
+// 0.5 s On / 0.5 Off => 15624 / 2 = 7812
 
-#define TARGET_COUNT 15625
-#define CYCLE_10p 1562
+#define TARGET_COUNT 15624
 
 void set_duty_cycle(uint8_t duty)
 {
@@ -24,11 +25,15 @@ void set_duty_cycle(uint8_t duty)
 	TCCR1B |= (1 << WGM12);
 	TCCR1A |= (1 << WGM11);
 
+	// Compare Output Mode (COM)
+	// OC1A on TCCR1 reg A
+	// When OCR1A is reached clear bit on OC1A (here LED D2)
+	TCCR1A |= 1 << COM1A1;
+
 	// Set TOP value of Counter for Clock Frequency
 	ICR1 = TARGET_COUNT;
 	// Set duty cycle compare
-	// OCR1A = (TARGET_COUNT * duty) / 100; // duty is a percentage (0-100)
-	OCR1A = TARGET_COUNT * 0.10;
+	OCR1A = (uint16_t)((uint32_t)TARGET_COUNT * duty / 100); // Convert to avoid truncation
 }
 
 void setup()
@@ -43,12 +48,7 @@ void setup()
 	TCCR1B |= (1 << CS10);
 	TCCR1B |= (1 << CS12);
 
-	// Compare Output Mode (COM)
-	// OC1A on TCCR1 reg A
-	// Toggle Mode for OC1A on Compare Match with COM1A0
-	// When OCR1A is reached toggle bit on OC1A (here LED D2)
-	TCCR1A |= 1 << COM1A0;
-	set_duty_cycle(20);
+	set_duty_cycle(10);
 }
 
 int main()

@@ -30,7 +30,9 @@ void delay(uint32_t cycles)
 	cycles = cycles / instructions_tick;
 	while (cycles--)
 	{
-		__asm__ __volatile__("nop"); // Insert one clock cycle delay
+		// volatile prevent compiler optimizer to remove the nop "no operation"
+		// instruction
+		__asm__ __volatile__("nop");
 	}
 }
 

@@ -7,9 +7,11 @@
 // System Clock : 16MHz
 // Frequency = 16MHz / 1024 -> 15.625 KHz
 // Ttick = 1 / 15.625 KHz = 64 us
-// Cycles / Count = 1 s / 64 us = 15625
+// Cycles / Count = 1 s / 64 us = 15625 - 1
+// 1Hz = 15624
+// 0.5 s On / 0.5 Off => 15624 / 2 = 7812
 
-#define TARGET_COUNT 15625
+#define TARGET_COUNT 7812
 
 void setup()
 {

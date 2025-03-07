@@ -355,17 +355,27 @@ title: UART Frame
 bitsPerWidth: 12
 ---
 packet-beta
-0-1: "Idle"
-2: "Start"
-3-12: "Data Bits (5 to 9 bits)"
-13: "Parity"
-14-15: "Stop"
+0-1: "(Idle)"
+2: "St"
+3: '0'
+4: '1'
+5: '2'
+6: '3'
+7: '4'
+8: '5'
+9: '[6]'
+10: '[7]'
+11: '[8]'
+12: '[P]'
+13: 'Sp'
+14: '[Sp]'
+15-16: 'St/Idle'
 ```
 
-- The start bit signals the beginning of the frame
+- The start bit signals the beginning of the frame (always 0)
 - The data bits contain the actual data being transmitted
-- The parity bit is used for error checking
-- The stop bit signals the end of the frame
+- The parity bit is used for error checking (even, odd, or none)
+- The stop bit signals the end of the frame (always 1)
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/UART-signal.png/1920px-UART-signal.png" alt="UART Signal" />
 
@@ -650,6 +660,26 @@ Timer registers:
 ```bash
 # Listen to the serial port (ttyUSB0) with baud rate 115200
 screen /dev/ttyUSB0 115200
+```
+
+```bash
+# Kill the screen session
+Ctrl + A + K
+
+# Detach the screen session
+Ctrl + A + D
+
+# List available sessions
+screen -ls
+
+# Reattach to a session (if only one exists)
+screen -r
+
+# Reattach to a specific session
+screen -r session_id
+
+# Kill a specific session
+screen -X -S session_id quit
 ```
 
 [UART - AVR - Guide for use](http://www.rjhcoding.com/avrc-uart.php)

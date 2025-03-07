@@ -6,6 +6,7 @@
 
 - [AVR-Microcontroller-ATmega328P](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf)
   - [ATmega328P - Summary](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e58732)
+  - [Interrupt Vectors Table](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e15100)
 - [Calculator](https://www.rapidtables.com/convert/number/decimal-to-binary.html?x=16)
 
 ## Config
@@ -388,6 +389,97 @@ packet-beta
   - $UBRRn = \frac{Clock\ Frequency}{16 \times Baud\ Rate} - 1$
     - $UBRRn$ is the UART Baud Rate Register
 
+#### AVR Interrupts
+
+- [Interrupts - AVR](http://exploreembedded.com/wiki/Basics_of_AVR_Interrupts)
+- An interrupt is a signal that informs the microcontroller that a specific event has occurred
+- Interrupts allow the microcontroller to respond to external events in real-time
+
+##### Types of Interrupts
+
+- **External Interrupts**
+  - External interrupts are triggered by external events
+  - External interrupts can be triggered by changes on specific pins
+  - External interrupts can be used to wake the microcontroller from sleep mode
+- **Timer Interrupts**
+  - Timer interrupts are triggered by timer events
+  - Timer interrupts can be used to generate precise time delays
+  - Timer interrupts can be used to control the frequency of waveforms
+- **USART Interrupts**
+  - USART interrupts are triggered by UART events
+  - USART interrupts can be used to handle incoming and outgoing data
+  - USART interrupts can be used to implement a serial communication protocol
+
+##### Interrupt Vector Table
+
+- The interrupt vector table is a table of addresses that point to the interrupt service routines (ISRs)
+- The interrupt vector table is located at the beginning of the program memory
+
+[Interrupt Vectors Table](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e15100)
+| Vector | Address | Code | Description |
+| ------ | ------- | ---------- | ----------------------- |
+| 0 | 0x0000 | RESET | Reset |
+| 1 | 0x0002 | INT0 | External Interrupt 0 |
+| 2 | 0x0004 | INT1 | External Interrupt 1 |
+| 3 | 0x0006 | INT2 | External Interrupt 2 |
+| ... | ... | ... | ... |
+| 17 | 0x0012 | TIMER0_OVF | Timer/Counter0 Overflow |
+| ... | ... | ... | ... |
+
+##### Enabling Interrupts
+
+- To enable interrupts, the **Global Interrupt Enable (I)** bit in the **Status Register (SREG)** must be **set**
+
+```c
+#include <avr/interrupt.h>
+
+int main(void) {
+    sei(); // Enable global interrupts
+    ...
+}
+```
+
+- To enable a specific interrupt, the Interrupt Enable (IEn) bit in the Interrupt Mask Register (pIMSK) must be set
+
+```c
+#include <avr/interrupt.h>
+
+int main(void) {
+    TIMSK |= (1 << TOIE0); // Enable Timer/Counter0 Overflow Interrupt
+    ...
+}
+```
+
+- To disable a specific interrupt, the Interrupt Enable (IEn) bit in the Interrupt Mask Register (pIMSK) must be cleared
+
+```c
+#include <avr/interrupt.h>
+
+int main(void) {
+    TIMSK &= ~(1 << TOIE0); // Disable Timer/Counter0 Overflow Interrupt
+    ...
+}
+```
+
+##### Interrupt Service Routines
+
+- An **Interrupt Service Routine (ISR)** is a **function** that is called when an interrupt occurs
+  - The ISR is executed in response to the interrupt
+- The ISR must be defined using the **ISR** macro
+  - The ISR macro specifies the vector name for the interrupt
+
+```c
+#include <avr/interrupt.h>
+
+ISR(TIMER0_OVF_vect) {
+    // Timer/Counter0 Overflow Interrupt
+    ...
+}
+```
+
+- The ISR macro is used to define an ISR
+  - Example: The TIMER0_OVF_vect is the vector name for the Timer/Counter0 Overflow Interrupt
+
 ### Logic Gates
 
 - [Logic Gate](https://en.wikipedia.org/wiki/Logic_gate)
@@ -684,4 +776,7 @@ screen -X -S session_id quit
 ```
 
 [UART - AVR - Guide for use](http://www.rjhcoding.com/avrc-uart.php)
+[UART - AVR - Interrupts](http://www.rjhcoding.com/avrc-uart-interrupts.php)
+
+Ex01: Transmitting
 <img src="./Media/UART/UART - Transmitting - 8N1.png" alt="UART - Transmitting - 8N1" />

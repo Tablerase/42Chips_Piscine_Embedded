@@ -20,6 +20,7 @@
 // Doc: https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e37324
 // USART: Universal Synchronous and Asynchronous serial Receiver and Transmitter
 // Frame Format: https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e37087
+// Interrup Table: https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e15100
 
 void uart_init(uint16_t ubrr)
 {
@@ -37,6 +38,8 @@ void uart_init(uint16_t ubrr)
 	// Enable Reception
 	// RXEN0: Receiver Enable 0
 	UCSR0B |= 1 << RXEN0;
+	// RXCIE0: X Complete Interrupt Enable 0
+	UCSR0B |= 1 << RXCIE0;
 
 	// USART Format
 	// 8N1 : 8 data bits, No parity, 1 bit Stop
@@ -47,6 +50,11 @@ void uart_init(uint16_t ubrr)
 	// No parity (00 - UPM[1:0])
 	// USART Stop Bit Select
 	// 1 Bit stop (0 - USBS0)
+
+	// Allow Global Interrupts
+	// SEI - Sets the Global Interrupt Flag (I) in SREG (Status Register)
+	sei();
+	// To disable : CLI - Clears the Global Interrupt Flag (I) in SREG (Status Register)
 }
 
 bool uart_tx_is_ready(void)
@@ -97,14 +105,36 @@ unsigned char uart_rx(void)
 	return UDR0;
 }
 
+volatile char received_char;
+
+// Function to convert between upper and lower case
+char toggle_case(char c)
+{
+	// If uppercase, convert to lowercase
+	if (c >= 'A' && c <= 'Z')
+		return c + 32;
+
+	// If lowercase, convert to uppercase
+	if (c >= 'a' && c <= 'z')
+		return c - 32;
+
+	// Return unchanged if not a letter
+	return c;
+}
+
+// Interrupt Service Routine (ISR) for UART receive
+ISR(USART_RX_vect)
+{
+	received_char = UDR0;
+
+	received_char = toggle_case(received_char);
+	uart_tx(received_char);
+}
+
 int main(void)
 {
 	uart_init(MyUBRR);
-	unsigned char received_char;
 	while (1)
 	{
-		received_char = uart_rx();
-		_delay_ms(HUMAN_VIEW_TRANSIT_IN_MS);
-		uart_tx(received_char);
-	}
+	};
 }

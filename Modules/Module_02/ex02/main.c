@@ -5,8 +5,12 @@
 
 #define HUMAN_VIEW_PROCESS_IN_MS 180
 #define HUMAN_VIEW_TRANSIT_IN_MS 20
+#define HUMAN_AUDITORY_PROCESS_IN_MS 140
+#define HUMAN_AUDITORY_TRANSIT_IN_MS 8
+#define HUMAN_TOUCH_PROCESS_IN_MS 155
+
 #ifndef F_CPU
-#define F_CPU 16000000
+#define F_CPU 16000000UL
 #endif
 #ifndef BAUD_RATE
 #define BAUD_RATE 115200
@@ -16,12 +20,6 @@
 // Doc: https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e37324
 // USART: Universal Synchronous and Asynchronous serial Receiver and Transmitter
 // Frame Format: https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e37087
-
-typedef enum
-{
-	TRANSMIT,
-	RECEIVE
-} io_status;
 
 void uart_init(uint16_t ubrr)
 {
@@ -70,12 +68,39 @@ void uart_tx(unsigned char c)
 	UDR0 = c;
 }
 
+void uart_printstr(const unsigned char *str)
+{
+	while (*str)
+	{
+		uart_tx(*str);
+		str++;
+	}
+}
+
+bool uart_rx_is_ready(void)
+{
+	// USART Control Status Reg
+	// RXC0 : USART Receive Complete
+	// 1: Flag set when unread data in buffer. 0: When receive buffer is empty
+	return (UCSR0A & (1 << RXC0)) == 0 ? false : true;
+}
+
+unsigned char uart_rx(void)
+{
+	while (uart_rx_is_ready() != true)
+	{
+	}
+	return UDR0;
+}
+
 int main(void)
 {
 	uart_init(MyUBRR);
+	unsigned char received_char;
 	while (1)
 	{
-		uart_tx('Z');
-		_delay_ms(1000);
+		received_char = uart_rx();
+		_delay_ms(HUMAN_VIEW_TRANSIT_IN_MS);
+		uart_tx(received_char);
 	}
 }

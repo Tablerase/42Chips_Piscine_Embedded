@@ -658,6 +658,7 @@ Timer registers:
 ### Module02: UART Protocol
 
 ```bash
+# Screen : is a full-screen window manager that multiplexes a physical terminal between several processes
 # Listen to the serial port (ttyUSB0) with baud rate 115200
 screen /dev/ttyUSB0 115200
 ```
@@ -683,3 +684,4 @@ screen -X -S session_id quit
 ```
 
 [UART - AVR - Guide for use](http://www.rjhcoding.com/avrc-uart.php)
+<img src="./Media/UART/UART - Transmitting - 8N1.png" alt="UART - Transmitting - 8N1" />

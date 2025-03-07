@@ -17,12 +17,6 @@
 // USART: Universal Synchronous and Asynchronous serial Receiver and Transmitter
 // Frame Format: https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e37087
 
-typedef enum
-{
-	TRANSMIT,
-	RECEIVE
-} io_status;
-
 void uart_init(uint16_t ubrr)
 {
 	// Setup BAUD RATE (data speed)
@@ -70,12 +64,21 @@ void uart_tx(unsigned char c)
 	UDR0 = c;
 }
 
+void uart_printstr(const char *str)
+{
+	while (*str)
+	{
+		uart_tx(*str);
+		str++;
+	}
+}
+
 int main(void)
 {
 	uart_init(MyUBRR);
 	while (1)
 	{
-		uart_tx('Z');
-		_delay_ms(1000);
+		uart_printstr("Hello World!");
+		_delay_ms(2000);
 	}
 }

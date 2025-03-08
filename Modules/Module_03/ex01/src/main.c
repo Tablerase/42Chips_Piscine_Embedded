@@ -76,5 +76,31 @@ int main(void)
 		led_D5_Green(true);
 		_delay_ms(1000);
 		led_D5_Green(false);
+		// Yellow
+		led_D5_Red(true);
+		led_D5_Green(true);
+		_delay_ms(1000);
+		led_D5_Red(false);
+		led_D5_Green(false);
+		// Cyan
+		led_D5_Blue(true);
+		led_D5_Green(true);
+		_delay_ms(1000);
+		led_D5_Blue(false);
+		led_D5_Green(false);
+		// Magenta
+		led_D5_Blue(true);
+		led_D5_Red(true);
+		_delay_ms(1000);
+		led_D5_Red(false);
+		led_D5_Blue(false);
+		// White
+		led_D5_Blue(true);
+		led_D5_Red(true);
+		led_D5_Green(true);
+		_delay_ms(1000);
+		led_D5_Red(false);
+		led_D5_Blue(false);
+		led_D5_Green(false);
 	}
 }

@@ -97,7 +97,7 @@ void update_button(bool *button_status, int button_id)
 // 1Hz = 15624
 // 0.5 s On / 0.5 Off => 15624 / 2 = 7812
 
-#define TARGET_COUNT 15625
+#define TARGET_COUNT 15624
 
 void set_duty_cycle(uint8_t duty)
 {

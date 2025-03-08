@@ -113,7 +113,8 @@ int main(void)
 	const char *true_password = "secret";
 	char username[STR_LENGTH];
 	char password[STR_LENGTH];
-
+	username[0] = '\0';
+	password[0] = '\0';
 	bool login = false;
 
 	while (login == false)

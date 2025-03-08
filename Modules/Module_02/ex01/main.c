@@ -73,12 +73,56 @@ void uart_printstr(const char *str)
 	}
 }
 
+// Timer Count 1 : 16bit = 2^16 = 65536 max count
+// System Clock : 16MHz
+// Frequency = 16MHz / 1024 -> 15.625 KHz
+// Ttick = 1 / 15.625 KHz = 64 us
+// Cycles / Count = 2 s / 64 us = 31250
+// 2Hz = 31250
+
+#define TARGET_COUNT 31249
+
+void time1_init()
+{
+	// Prescaler register: Clock Select
+	// - Clock Select (CS) on Register B (TCCR1B)
+	// - Setting the prescaler 1024 here
+	TCCR1B |= (1 << CS10);
+	TCCR1B |= (1 << CS12);
+
+	// Waveform Generation Mode (WGM)
+	// Control counting sequence and waveform generation based on count
+	// Here we want to clear the count at compare match
+	// Mode: Clear Timer on Compare match (CTC)
+	// Here CTC for OCR1A is 1 on WGM12 with Register B
+	TCCR1B |= 1 << WGM12;
+
+	// TCNT1 - Timer CouNter of Timer 1
+	// Compare with Output Compare Reg A of Timer 1 (OCR1A)
+	OCR1A = TARGET_COUNT;
+
+	// Enable Interrupt
+	// TIMSK 1: Timer/Counter 1 Interrupt Mask Register
+	// OCIEA: Output Compare A Match Interrupt Enable
+	TIMSK1 |= 1 << OCIE1A;
+}
+
+ISR(TIMER1_COMPA_vect)
+{
+	// Timer/Counter1 Compare Match A interrupt
+
+	// Here every 2Hz
+	uart_printstr("\n\rHello World!");
+}
+
 int main(void)
 {
+	// Enable global interrupt
+	sei();
+	// Setup
 	uart_init(MyUBRR);
+	time1_init();
 	while (1)
 	{
-		uart_printstr("Hello World!");
-		_delay_ms(2000);
 	}
 }

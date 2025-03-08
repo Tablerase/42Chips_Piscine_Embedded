@@ -143,9 +143,9 @@ Timer2:
 void init_rgb()
 {
 	// Activate LED
-	DDRD |= (1 << DDD6);
-	DDRD |= (1 << DDD5);
-	DDRD |= (1 << DDD3);
+	// DDRD |= (1 << DDD6);
+	// DDRD |= (1 << DDD5);
+	// DDRD |= (1 << DDD3);
 
 	// Setup Timer (TCCRn Timer Counter Control Reg n)
 	// Prescaler: 8 (No impact)
@@ -153,15 +153,13 @@ void init_rgb()
 	TCCR2B |= 1 << CS21;
 
 	// Set Fast PWM for Timer0 and OCRA
-	// Green: OC0A
-	// Red: OC0B
+	// Red: OC0B, Green: OC0A
 	TCCR0A |= (1 << WGM00) + (1 << WGM01);
 	// Blue: OC2B
 	TCCR2A |= (1 << WGM00) + (1 << WGM01);
 
-	// Compare Mode for 0CnA - Set OCnA on Compare Match, clear OCnA at BOTTOM (inverting mode)
+	// Compare Mode for 0CnA - Clear OC0B on Compare Match, set OC0B at BOTTOM, (non-inverting mode)
 	// Green
-	// TCCR0A |= (1 << COM0A1) + (1 << COM0A0);
 	TCCR0A |= (1 << COM0A1);
 	// Red
 	TCCR0A |= (1 << COM0B1);
@@ -171,6 +169,12 @@ void init_rgb()
 
 void set_rgb(uint8_t r, uint8_t g, uint8_t b)
 {
+	if (r == 0 && g == 0 && b == 0)
+	{
+		DDRD &= ~((1 << DDD6) + (1 << DDD5) + (1 << DDD3));
+		return;
+	}
+	DDRD |= (1 << DDD6) + (1 << DDD5) + (1 << DDD3);
 	OCR0B = r;
 	OCR0A = g;
 	OCR2B = b;
@@ -194,16 +198,3 @@ void wheel(uint8_t pos)
 		set_rgb(pos * 3, 255 - pos * 3, 0);
 	}
 };
-
-int main(void)
-{
-	init_rgb();
-	// Make gradient RGB transition
-	uint8_t pos = 0;
-	while (1)
-	{
-		wheel(pos);
-		_delay_ms(HUMAN_VIEW_TRANSIT_IN_MS * 2);
-		pos++;
-	}
-}

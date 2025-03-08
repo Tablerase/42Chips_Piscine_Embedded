@@ -63,6 +63,7 @@ void led_D5_Green(bool status)
 
 /*
 CSn2:0: Clock Select bits (prescaler):
+	n = [1:0]
 	+-------+-------+-------+-------------------------------------------+
 	| CSn2  | CSn1  | CSn0  | Description                               |
 	+-------+-------+-------+-------------------------------------------+
@@ -74,6 +75,19 @@ CSn2:0: Clock Select bits (prescaler):
 	|   1   |   0   |   1   | clkIO/1024 (From prescaler)               |
 	|   1   |   1   |   0   | External clock source on T0 pin, falling  |
 	|   1   |   1   |   1   | External clock source on T0 pin, rising   |
+	+-------+-------+-------+-------------------------------------------+
+	n = 2
+	+-------+-------+-------+-------------------------------------------+
+	| CSn2  | CSn1  | CSn0  | Description                               |
+	+-------+-------+-------+-------------------------------------------+
+	|   0   |   0   |   0   | No clock source (Timer/Counter stopped)   |
+	|   0   |   0   |   1   | clkIO/1 (No prescaling)                   |
+	|   0   |   1   |   0   | clkIO/8 (From prescaler)                  |
+	|   0   |   1   |   1   | clkIO/32 (From prescaler)                 |
+	|   1   |   0   |   0   | clkIO/64 (From prescaler)                 |
+	|   1   |   0   |   1   | clkIO/128 (From prescaler)                |
+	|   1   |   1   |   0   | clkIO/256 (From prescaler)                |
+	|   1   |   1   |   1   | clkIO/1024 (From prescaler)               |
 	+-------+-------+-------+-------------------------------------------+
 
 	+------+------+------+------+---------------------------+-----+-----------------+------------------+
@@ -136,22 +150,29 @@ void init_rgb()
 	DDRD |= (1 << DDD3);
 
 	// Setup Timer (TCCRn Timer Counter Control Reg n)
-	// Prescaler 1024 : 16MHz/1024 -> 15.625KHz - Max Reduce Frequency
-	TCCR0B |= (1 << CS01);
-	TCCR1B |= (1 << CS00);
-	TCCR1B |= (1 << CS02);
+	// Prescaler: 1024 : 16MHz / 1024 = 15.625KHz
+	// Ttick = 1 / 15.625 KHz = 64 us
+	// Max count : 2^8 = 256 -> 256 * 64us = 16.384 ms
+	TCCR0B |= (1 << CS00) + (1 << CS02);			   // 1024 Timer0
+	TCCR2B |= (1 << CS00) + (1 << CS01) + (1 << CS02); // 1024 Timer2
+	// TCCR0B |= 1 << CS01;
+	// TCCR2B |= 1 << CS21;
 
 	// Set Fast PWM for Timer0 and OCRA
 	// Green: OC0A
 	// Red: OC0B
-	TCCR0A |= (1 << WGM00);
-	TCCR0A |= (1 << WGM01);
+	TCCR0A |= (1 << WGM00) + (1 << WGM01);
+	// Blue: OC2B
+	TCCR2A |= (1 << WGM00) + (1 << WGM01);
 
-	// Compare Mode for 0C0A - Set OC0A on Compare Match, clear OC0A at BOTTOM (inverting mode)
+	// Compare Mode for 0CnA - Set OCnA on Compare Match, clear OCnA at BOTTOM (inverting mode)
 	// Green
-	TCCR0A |= (1 << COM0A1) + (1 << COM0A0);
+	// TCCR0A |= (1 << COM0A1) + (1 << COM0A0);
+	TCCR0A |= (1 << COM0A1);
 	// Red
-	TCCR0A |= (1 << COM0B1) + (1 << COM0B0);
+	TCCR0A |= (1 << COM0B1);
+	// Blue
+	TCCR2A |= (1 << COM2B1);
 }
 
 void set_rgb(uint8_t r, uint8_t g, uint8_t b)
@@ -188,7 +209,7 @@ int main(void)
 	while (1)
 	{
 		wheel(pos);
-		_delay_ms(HUMAN_VIEW_TRANSIT_IN_MS);
+		_delay_ms(HUMAN_VIEW_TRANSIT_IN_MS * 2);
 		pos++;
 	}
 }

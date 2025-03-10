@@ -64,10 +64,6 @@ int main(void)
 {
 	while (1)
 	{
-		// Blue
-		led_D5_Blue(true);
-		_delay_ms(1000);
-		led_D5_Blue(false);
 		// Red
 		led_D5_Red(true);
 		_delay_ms(1000);
@@ -76,5 +72,9 @@ int main(void)
 		led_D5_Green(true);
 		_delay_ms(1000);
 		led_D5_Green(false);
+		// Blue
+		led_D5_Blue(true);
+		_delay_ms(1000);
+		led_D5_Blue(false);
 	}
 }

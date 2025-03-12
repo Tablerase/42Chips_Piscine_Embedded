@@ -780,3 +780,7 @@ screen -X -S session_id quit
 
 Ex01: Transmitting
 <img src="./Media/UART/UART - Transmitting - 8N1.png" alt="UART - Transmitting - 8N1" />
+
+### Module03: AVR Timers
+
+### Module04: AVR Interrupts

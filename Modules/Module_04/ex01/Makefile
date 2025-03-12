@@ -36,23 +36,23 @@ directories:
 	@mkdir -p $(OBJ_DIR)
 
 hex: main.hex
-	@echo "Hex building Done"
+	@echo "$(BOLD)Hex building Done$(RESET)"
 
 main.hex: main.bin
 	$(OBJCOPY) -O ihex -R .eeprom $< $@
-	@echo "Converted to hex"
+	@echo "$(BOLD)Hex file created$(RESET)"
 
 main.bin: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
-	@echo "Linked"
+	@echo "$(BOLD)Binary file created$(RESET)"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -o $@ $<
-	@echo "Compiled $<"
+	@echo "$(BOLD)Compiled $<$(RESET)"
 
 flash: main.hex
 	$(AVRDUDE) $(PROGRAMMER) -U flash:w:$<:i
-	@echo "Uploaded"
+	@echo "$(BOLD)Program Flashed$(RESET)"
 
 clean: clean_msg
 	rm -f main.hex main.bin $(OBJS)
@@ -61,6 +61,9 @@ clean: clean_msg
 fclean: clean
 
 re: re_msg fclean all
+
+screen: all
+	screen $(PORT) $(BAUD_RATE)
 
 ################### Special Target ###################
 
@@ -72,7 +75,8 @@ help:
 	@echo "  make [target]"
 	@echo ""
 	@echo "$(BOLD)Targets:$(RESET)"
-	@echo "  $(C_EXEC)all$(RESET)		Build and flash the program"
+	@echo "  $(C_EXEC)all$(RESET)		Build and Flash the program"
+	@echo "  $(C_EXEC)screen$(RESET)	Build, Flash and Open a screen session to the board"
 	@echo "  $(C_ARCHIVED)clean$(RESET)		Remove object files"
 	@echo "  $(C_ARCHIVED)fclean$(RESET)	Remove object files and the program"
 	@echo "  $(C_ARCHIVED)re$(RESET)		Rebuild the program"

@@ -27,4 +27,13 @@
 #define BAUD_RATE 115200
 #endif
 
+// USART: Universal Synchronous and Asynchronous serial Receiver and Transmitter
+#define MyUBRR F_CPU / 16 / BAUD_RATE
+void uart_init(uint16_t ubrr);
+void uart_tx(unsigned char c);
+void uart_printstr(const char *str);
+// Debugging functions
+void debug();
+void uart_printf(const char *format, ...);
+
 #endif

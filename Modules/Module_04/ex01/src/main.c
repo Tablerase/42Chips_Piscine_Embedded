@@ -2,9 +2,8 @@
 
 #define TARGET_COUNT 15625
 
-volatile int8_t slope = 20;
 volatile uint8_t duty_cycle = 0;
-volatile uint8_t time = 0;
+volatile uint16_t time = 0;
 
 void set_duty_cycle(uint8_t duty)
 {
@@ -29,21 +28,36 @@ void init_timer0(void)
 
 ISR(TIMER0_COMPA_vect)
 {
-	time++;
-	if (time % 100 == 0)
+	uint8_t slope = 0;
+	if (time % 1000 == 0)
 	{
-		duty_cycle += slope;
-		set_duty_cycle(duty_cycle);
-		if (time >= 50)
+		if (time >= 10000)
 		{
-			slope = -slope;
-		}
-		if (time >= 100)
-		{
+			uart_printf("%sRESET%s", ANSI_REDB, ANSI_RESET);
 			time = 0;
-			slope = -slope;
 		}
+		if (time <= 4000)
+		{
+			uart_printf("%sUP%s", ANSI_BLUB, ANSI_RESET);
+			slope = 20;
+		}
+		if (time >= 5000)
+		{
+			uart_printf("%sDOWN%s", ANSI_GRNB, ANSI_RESET);
+			slope = -20;
+		}
+		if (time == 0)
+		{
+			duty_cycle = 0;
+		}
+		else
+		{
+			duty_cycle += slope;
+		}
+		set_duty_cycle(duty_cycle);
+		uart_printf("Time: %d, Duty: %d, Slope: %d", time, duty_cycle, slope);
 	}
+	time++;
 }
 
 void clock_setup()
@@ -83,11 +97,13 @@ void setup()
 {
 	clock_setup();
 	init_timer0();
+	sei();
 	set_duty_cycle(0);
 }
 
 int main(void)
 {
+	debug();
 	setup();
 	while (1)
 	{

@@ -44,7 +44,7 @@
 
 ## Information
 
-### AVR Programming
+### AVR
 
 - [AVR Programming](https://www.instructables.com/AVR-Programming-with-Arduino-AVRdude-and-AVR-gcc/)
 
@@ -480,6 +480,11 @@ ISR(TIMER0_OVF_vect) {
 - The ISR macro is used to define an ISR
   - Example: The TIMER0_OVF_vect is the vector name for the Timer/Counter0 Overflow Interrupt
 
+#### AVR Analog-to-Digital Converter (ADC)
+
+- [ADC - Wiki](https://en.wikipedia.org/wiki/Analog-to-digital_converter)
+- [ADC - AVR](https://ece-classes.usc.edu/ee459/library/documents/ADC.pdf)
+
 ### Logic Gates
 
 - [Logic Gate](https://en.wikipedia.org/wiki/Logic_gate)
@@ -701,11 +706,11 @@ Infos about frequency and time:
 - Prescaling: Allow to skip a certain number of ticks
   - **Prescaler** values: `1, 8, 64, 256, 1024` (AVR Microcontrollers)
   - Example:
-    - 16MHz / 1 = 16,000,000Hz
-    - 16MHz / 8 = 2,000,000Hz
-    - 16MHz / 64 = 250,000Hz
-    - 16MHz / 256 = 62,500Hz
-    - 16MHz / 1024 = 15,625Hz
+    - 16MHz / 1 = 16,000,000Hz = 62.5ns
+    - 16MHz / 8 = 2,000,000Hz = 0.5µs
+    - 16MHz / 64 = 250,000Hz = 4µs
+    - 16MHz / 256 = 62,500Hz = 16µs
+    - 16MHz / 1024 = 15,625Hz = 64µs
 
 Delay in code :
 
@@ -784,3 +789,12 @@ Ex01: Transmitting
 ### Module03: AVR Timers
 
 ### Module04: AVR Interrupts
+
+### Module05: AVR ADC
+
+<img src="./Media/ADC/ADC_ATMega328P_Block_Schema.png" alt="ADC - ATMega328P Block Schema" />
+
+- $ADC = \frac{V_{in} \times 1024}{V_{ref}}$
+  - $V_{in}$: Input Voltage
+  - $V_{ref}$: Reference Voltage
+  - $1024$: Resolution (10-bit ADC: $2^{10} = 1024$)

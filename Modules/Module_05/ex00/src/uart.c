@@ -1,5 +1,8 @@
 #include "piscine.h"
+
+#ifdef DEBUG
 #include <stdarg.h>
+#endif
 
 // Doc: https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e37324
 // USART: Universal Synchronous and Asynchronous serial Receiver and Transmitter
@@ -89,13 +92,8 @@ unsigned char uart_rx(void)
 	return UDR0;
 }
 
-void debug()
-{
-	uart_init(MyUBRR);
-}
-
 // Convert integer to string and return the length
-static uint8_t itoa_simple(int32_t value, char *buffer, uint8_t base)
+uint8_t itoa_simple(int32_t value, char *buffer, uint8_t base)
 {
 	const char digits[] = "0123456789ABCDEF";
 	char tmp[12]; // 32-bit int max digits + sign
@@ -138,6 +136,12 @@ static uint8_t itoa_simple(int32_t value, char *buffer, uint8_t base)
 	*buffer = '\0';
 
 	return length;
+}
+
+#ifdef DEBUG
+void debug()
+{
+	uart_init(MyUBRR);
 }
 
 void uart_printf(const char *format, ...)
@@ -196,3 +200,4 @@ void uart_printf(const char *format, ...)
 
 	va_end(args);
 }
+#endif

@@ -32,6 +32,7 @@
 void uart_init(uint16_t ubrr);
 void uart_tx(unsigned char c);
 void uart_printstr(const char *str);
+uint8_t itoa_simple(int32_t value, char *buffer, uint8_t base);
 // Debugging functions
 void debug();
 void uart_printf(const char *format, ...);

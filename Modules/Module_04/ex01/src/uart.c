@@ -1,5 +1,8 @@
 #include "piscine.h"
+
+#ifdef DEBUG
 #include <stdarg.h>
+#endif
 
 // Doc: https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e37324
 // USART: Universal Synchronous and Asynchronous serial Receiver and Transmitter
@@ -140,6 +143,7 @@ static uint8_t itoa_simple(int32_t value, char *buffer, uint8_t base)
 	return length;
 }
 
+#ifdef DEBUG
 void uart_printf(const char *format, ...)
 {
 	va_list args;
@@ -196,3 +200,4 @@ void uart_printf(const char *format, ...)
 
 	va_end(args);
 }
+#endif

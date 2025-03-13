@@ -4,7 +4,6 @@
 
 ## Resources
 
-- [Atmega328p](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf)
 - [AVR-Microcontroller-ATmega328P](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf)
   - [ATmega328P - Summary](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e58732)
   - [Interrupt Vectors Table](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e15100)
@@ -850,10 +849,47 @@ Ex01: Transmitting
 <img src="./Media/ADC/ADC_ATMega328P_Block_Schema.png" alt="ADC - ATMega328P Block Schema" />
 
 - $ADC = \frac{V_{in} \times 1024}{V_{ref}}$
+
   - $V_{in}$: Input Voltage
   - $V_{ref}$: Reference Voltage
   - $1024$: Resolution (10-bit ADC: $2^{10} = 1024$)
 
+- [Atmega328p - Internal Temperature - datasheet](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf#G1202793)
+
 ### Module06: I2C Protocol
 
-- [I2C - Temperature - Recommanded 7.4](http://www.aosong.com/userfiles/files/media/Data%20Sheet%20AHT20.pdf)
+```mermaid
+flowchart LR
+    subgraph MCU["ATmega328P (Master)"]
+        direction TB
+        M_SDA["SDA (PC4)"]
+        M_SCL["SCL (PC5)"]
+        M_GND["GND"]
+        M_VCC["VCC (5V)"]
+    end
+
+    subgraph Sensor["AHT20 (Slave)"]
+        direction TB
+        S_SDA["SDA"]
+        S_SCL["SCL"]
+        S_GND["GND"]
+        S_VIN["VIN (2.2-5.5V)"]
+    end
+
+    M_SDA -->|"I2C Data"| S_SDA
+    M_SCL -->|"I2C Clock"| S_SCL
+    M_GND --- S_GND
+    M_VCC -->|"Power"| S_VIN
+
+    style MCU fill:#f96,stroke:#333,color:#000
+    style Sensor fill:#69f,stroke:#333,color:#fff
+```
+
+- $F_{SCL} = \frac{F_{CPU}}{16 + 2 \times TWBR \times Prescaler}$
+
+  - $TWBR = \text{Value in TW Bit Rate Register}$
+  - $TWBR = \frac{(F_{CPU} / F_{SCL}) - 16}{2 \times Prescaler}$
+
+- [I2C - AHT20 - Datasheet - Recommanded section 7.4](http://www.aosong.com/userfiles/files/media/Data%20Sheet%20AHT20.pdf)
+
+- [Example - I2C - AHT20 - AVR](https://www.avrfreaks.net/s/topic/a5C3l000000Bq30EAC/t391353)

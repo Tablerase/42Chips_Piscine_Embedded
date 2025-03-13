@@ -14,7 +14,7 @@ INC_DIR = include
 OBJ_DIR = obj
 
 # Compiler flags
-CFLAGS_ERRORS = -Wall -Wextra
+CFLAGS_ERRORS = -Wall -Wextra -Werror
 CFLAGS = -Os -mmcu=$(MCU) -DF_CPU=$(F_CPU) $(CFLAGS_ERRORS) -I$(INC_DIR)
 
 # Communication settings

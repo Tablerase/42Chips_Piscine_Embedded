@@ -64,7 +64,7 @@ ISR(TIMER1_COMPA_vect)
 	 * Selecting internal temperature sensor
 	 * ADMUX 1000
 	 */
-	ADMUX |= 1 << MUX3;
+	ADMUX = (ADMUX & 0xF0) | (1 << MUX3); // Clear previous MUX values and set to 1000
 
 	ADCSRA |= 1 << ADSC; // ADC Start Conversion
 
@@ -78,10 +78,12 @@ ISR(TIMER1_COMPA_vect)
 	uint16_t adc_value = (adc_hight << 8) | adc_low;
 	/**Transform voltage value into celsius value
 	 * https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e47538
-	 * Formula from datasheet: Temperature = (ADC_value - Tos) / k
-	 * 	- Where Tos = 314 -> the ADC reading at 25°C and k is a fixed coef (here arbitrary 0.76 to concorde with datasheet)
+	 *
+	 * https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf#G1202807
+	 * Formula from datasheet: 25°C / 352mV -> 0.071022727 mV/°C
 	 *  */
-	float temperature = (adc_value - 314) / 0.76;
+	float volt_to_c_ratio = 0.071022727;
+	float temperature = adc_value * volt_to_c_ratio;
 	int16_t temp_celsius = (int16_t)temperature;
 #ifdef DEBUG
 	uart_printf("Voltage: %d\r\n", adc_value);

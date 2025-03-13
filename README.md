@@ -4,6 +4,7 @@
 
 ## Resources
 
+- [Atmega328p](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf)
 - [AVR-Microcontroller-ATmega328P](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf)
   - [ATmega328P - Summary](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e58732)
   - [Interrupt Vectors Table](https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e15100)
@@ -482,8 +483,62 @@ ISR(TIMER0_OVF_vect) {
 
 #### AVR Analog-to-Digital Converter (ADC)
 
+References:
+
 - [ADC - Wiki](https://en.wikipedia.org/wiki/Analog-to-digital_converter)
 - [ADC - AVR](https://ece-classes.usc.edu/ee459/library/documents/ADC.pdf)
+
+Infos:
+
+- The Analog-to-Digital Converter (ADC) is used to convert analog signals into digital values
+- The ADC is used to measure analog signals from sensors, transducers, and other devices
+- The ADC converts the analog signal into a digital value that can be processed by the microcontroller
+
+#### I2C Protocol
+
+- [I2C - Wiki](https://en.wikipedia.org/wiki/I%C2%B2C)
+- [I2C - Introduction - Circuitbasics](https://www.circuitbasics.com/basics-of-the-i2c-communication-protocol/)
+
+<img src="https://www.circuitbasics.com/wp-content/uploads/2016/01/Introduction-to-I2C-Single-Master-Multiple-Slaves-2-227x300.png" align="right" width="300px" alt="I2C Protocol" />
+
+Infos:
+
+- I2C (Inter-Integrated Circuit) is a serial communication protocol used to transfer data between devices
+- I2C is a two-wire bus protocol that uses a clock signal (SCL) and a data signal (SDA)
+  - SCL: Serial Clock Line
+  - SDA: Serial Data Line
+- I2C is a master-slave protocol where the master device initiates the communication
+- I2C devices are connected in a multi-master configuration, allowing multiple devices to communicate on the same bus
+
+I2C communication follows a specific protocol structure:
+
+- Message Structure:
+  - Messages begin with a START condition
+  - Include an address frame identifying the target device
+  - Contain data frames (8 bits each)
+  - End with a STOP condition
+- Data Transfer Process:
+  - Master devices control the clock signal (SCL)
+  - Slave devices respond to their addresses
+  - Each byte transfer includes acknowledgment (ACK/NACK)
+  - Multiple bytes can be transferred in a single message
+
+<img src="https://www.circuitbasics.com/wp-content/uploads/2016/01/Introduction-to-I2C-Message-Frame-and-Bit-2-1024x258.png" alt="I2C Message Structure" />
+
+Advantages:
+
+- Minimal wiring requirements (only two wires needed)
+- Support for multiple devices on the same bus
+- Flexible addressing system (7-bit or 10-bit)
+- Low hardware overhead
+- Bidirectional communication capability
+
+Limitations:
+
+- Limited speed compared to other protocols like SPI
+- Restricted bus length due to capacitance limitations
+- Potential bus contention issues with multiple masters
+- Requires proper pull-up resistor configuration
 
 ### Logic Gates
 
@@ -798,3 +853,7 @@ Ex01: Transmitting
   - $V_{in}$: Input Voltage
   - $V_{ref}$: Reference Voltage
   - $1024$: Resolution (10-bit ADC: $2^{10} = 1024$)
+
+### Module06: I2C Protocol
+
+- [I2C - Temperature - Recommanded 7.4](http://www.aosong.com/userfiles/files/media/Data%20Sheet%20AHT20.pdf)

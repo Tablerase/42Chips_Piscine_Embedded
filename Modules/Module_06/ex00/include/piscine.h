@@ -6,6 +6,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <util/twi.h>
 // std
 #include <stdbool.h>
 
@@ -26,6 +27,9 @@
 #ifndef BAUD_RATE
 #define BAUD_RATE 115200
 #endif
+
+// I2C
+void print_i2c_status(uint8_t status_code);
 
 // RGB leds
 void led1_on(bool status);

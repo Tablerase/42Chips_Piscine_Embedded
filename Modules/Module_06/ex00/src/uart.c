@@ -166,6 +166,11 @@ void uart_printf(const char *format, ...)
 				itoa_simple(num, buffer, 10);
 				uart_printstr(buffer);
 				break;
+			case 'b': // Binary
+				num = va_arg(args, int);
+				itoa_simple(num, buffer, 2);
+				uart_printstr(buffer);
+				break;
 			case 'x': // Hexadecimal
 				num = va_arg(args, int);
 				itoa_simple(num, buffer, 16);

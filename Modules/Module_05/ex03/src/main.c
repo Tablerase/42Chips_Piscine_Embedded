@@ -64,7 +64,7 @@ ISR(TIMER1_COMPA_vect)
 	 * Selecting internal temperature sensor
 	 * ADMUX 1000
 	 */
-	ADMUX = (ADMUX & 0xF0) | (1 << MUX3); // Clear previous MUX values and set to 1000
+	ADMUX |= (ADMUX & 0xF0) | (1 << MUX3); // Clear previous MUX values and set to 1000
 
 	ADCSRA |= 1 << ADSC; // ADC Start Conversion
 
@@ -80,7 +80,8 @@ ISR(TIMER1_COMPA_vect)
 	 * https://docs.arduino.cc/resources/datasheets/Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet.pdf#_OPENTOPIC_TOC_PROCESSING_d94e47538
 	 *
 	 * https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf#G1202807
-	 * Formula from datasheet: 25°C / 352mV -> 0.071022727 mV/°C
+	 * ? Data from datasheet for approximate ratio: 25°C / 352mV -> 0.071022727 mV/°C
+	 * ! Mathematicaly false (non linear : neg value cannot be handle for example) but allow somewhat expended temperature value
 	 *  */
 	float volt_to_c_ratio = 0.071022727;
 	float temperature = adc_value * volt_to_c_ratio;

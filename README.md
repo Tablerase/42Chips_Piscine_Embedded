@@ -892,4 +892,6 @@ flowchart LR
 
 - [I2C - AHT20 - Datasheet - Recommanded section 7.4](http://www.aosong.com/userfiles/files/media/Data%20Sheet%20AHT20.pdf)
 
+<img src="./Media/I2C/AHT20-I2C.png" alt="I2C - AHT20 - Communication" />
+
 - [Example - I2C - AHT20 - AVR](https://www.avrfreaks.net/s/topic/a5C3l000000Bq30EAC/t391353)

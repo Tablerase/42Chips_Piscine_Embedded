@@ -11,230 +11,157 @@
  *		- TW PS (Prescaler): https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf#G1201751
  *	- TWCR – TWI Control Register: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf#G1201548
  *		- TWINT: TW Interrupt Flag
+ *			1. Clearing the interrupt flag: Setting the TWINT bit to 1 in the TWCR (TWI Control Register) actually clears the flag. This is counterintuitive but standard for many AVR microcontroller flag bits.
+ * 			2. Triggering TWI action: When you write 1 to TWINT, it signals the TWI hardware to execute the requested operation - in this case, generating a START condition.
+ *			3. Operation completion indicator: After setting TWINT, the hardware will automatically clear it when the operation completes. Your code should wait for this to happen before proceeding.
  *		- TWSTA: TW START Condition Bit
+ *			- TWSTA - Start condition bit - become a master on the 2-wire serial bus or Wait until STOP to become master
  *		- TWEN: TW Enable
- *		- TWSTO: TW STOP Condition Bit
- *	- TWAR – TWI (Slave) Address Register: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf#G1201883
+ *		- TWSO: TW STOP Condition Bit
+ *	- TWAR: TWI(Slave) Address Registr : https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf#G1201883
  *
  * AHT20:
  * Docs (section 7: sensor commuciation): http://www.aosong.com/userfiles/files/media/Data%20Sheet%20AHT20.pdf
  * I²C device address: 0x38
  * Measurement command: 0xAC
+ *
+ * cyclic redundancy check (CRC)? CRC is an algorithm used to detect errors in data transmission
  */
 
 #define AHT20_ADDRESS 0x38
 #define AHT20_MEASURE_CMD 0xAC
-#define AHT20_DATA0 0b00110011
-#define AHT20_DATA1 0b00000000
+#define AHT20_PARAM1 0x33
+#define AHT20_PARAM2 0x00
 
-typedef enum I2CMode
-{
-	WRITE,
-	READ
-} I2CMode;
+#define WRITE 0
+#define READ 1
 
-void i2c_init(void)
-{
-#ifdef DEBUG
-	uart_printf("%s INIT %s\r\n", ANSI_GRNB, ANSI_RESET);
-#endif
-	// Set SCL frequency: 100kHz with 16MHz CPU clock
-	// Formula: F_SCL = F_CPU / (16 + 2 * TWBR * prescaler)
-	// For 100kHz F_SCL with 16MHz F_CPU and with prescaler = 1 -> TWBR = 72
-
-	// Set bit rate register
-	TWBR = 72;
-
-	// Set prescaler to 1 (TWPS bits in TWSR)
-	TWSR &= ~((1 << TWPS0) | (1 << TWPS1));
-
-	// Enable TWI
-	TWCR = (1 << TWEN);
-
-	// Wait 100ms - AHT20 loading time
-	// After power-on, the sensor needs ≥100ms time (SCL is high at this time) to reach the idle state and it is ready to
-	// receive commands sent by the host (MCU).
-	_delay_ms(100);
-}
-
-/** Starts an I2C transmission between the microcontroller and the sensor.
- */
-void i2c_start(void)
-{
-
-	/**
-	 * TWSTA - Start condition bit - become a master on the 2-wire serial bus or Wait until STOP to become master
-	 * TWINT - Interrup flag:
-	 *	1. Clearing the interrupt flag: Setting the TWINT bit to 1 in the TWCR (TWI Control Register) actually clears the flag. This is counterintuitive but standard for many AVR microcontroller flag bits.
-	 * 	2. Triggering TWI action: When you write 1 to TWINT, it signals the TWI hardware to execute the requested operation - in this case, generating a START condition.
-	 *	3. Operation completion indicator: After setting TWINT, the hardware will automatically clear it when the operation completes. Your code should wait for this to happen before proceeding.
-	 * TWEN - Enable Two Wire
-	 */
-
-	// Start operation (become master)
-	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
-
-	// Wait for operation completion
-	while (!(TWCR & (1 << TWINT)))
-		;
-
-	// Recover status: Check value of TWI status register. Mask prescaler bits.
-	// TWSR - 7-3bit: status code - 2-0bit prescaler
-	uint8_t status = (TWSR & 0b11111000);
-	if (status != TW_START)
-	{
-#ifdef DEBUG
-		uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-		print_i2c_status(status);
-#endif
-	}
-	else
-	{
-#ifdef DEBUG
-		uart_printf("%s START %s", ANSI_MAGB, ANSI_RESET);
-#endif
-	}
-#ifndef DEBUG
-	print_i2c_status(status);
-#endif
-}
-
-/** Interrupts communication between the microcontroller and the sensor
- */
-void i2c_stop(void)
-{
-	// Transmit STOP Condition (TWSTO)
-	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
-#ifdef DEBUG
-	uart_printf("%s STOP %s", ANSI_MAGB, ANSI_RESET);
-#endif
-}
-
-void i2c_write(unsigned char data)
-{
-	// Load DATA into TWDR register.
-	TWDR = data;
-#ifdef DEBUG
-	uart_printf("%s %b %s", ANSI_WHTB, data, ANSI_RESET);
-#endif
-	// clear TWINT bit in TWCR to start transmission of data
-	TWCR = (1 << TWINT) | (1 << TWEN);
-	// Wait for address transmit and acknowledge
-	while (!(TWCR & (1 << TWINT)))
-		;
-}
-
-bool i2c_check_status(uint8_t check_status)
-{
-	// Recover ACK status
-	int8_t status = (TWSR & 0b11111000);
-	if (status != check_status)
-	{
-#ifdef DEBUG
-		uart_printf("%s ERROR %s\r\n", ANSI_REDB, ANSI_RESET);
-#endif
-		print_i2c_status(status);
-		return false;
-	}
-	else
-	{
-		if (status == TW_MT_SLA_ACK || status == TW_MT_DATA_ACK)
-		{
-#ifdef DEBUG
-			uart_printf("%s ACK %s", ANSI_GRAYB, ANSI_RESET);
-#endif
-		}
-		if (status == TW_MR_SLA_ACK || status == TW_MR_DATA_ACK)
-		{
-#ifdef DEBUG
-			uart_printf("%s ACK %s", ANSI_WHTB, ANSI_RESET);
-#endif
-		}
-		return true;
-	}
-}
+void i2c_init(void);
+void i2c_start(void);
+void i2c_stop(void);
+void i2c_write(uint8_t data);
+uint8_t i2c_read_ack(void);
+uint8_t i2c_read_nack(void);
 
 void print_hex_value(char c)
 {
 	char buffer[3];
 	itoa_simple(c, buffer, 16);
 	uart_printstr(buffer);
-	uart_printstr(" ");
 }
 
-void i2c_read(void)
+void i2c_init(void)
 {
-	// Start read of AHT20 measurement data
+	// Set bit rate for 100kHz I2C communication with 16MHz clock
+	TWBR = 72;
+	// Set prescaler 1
+	TWSR &= ~((1 << TWPS0) | (1 << TWPS1));
+
+	// Enable TWI (I2C)
+	TWCR = (1 << TWEN);
+
+	// Wait for AHT20 to initialize (100ms)
+	_delay_ms(100);
+}
+
+void i2c_start(void)
+{
+	// Send START condition
+	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)))
+		;
+}
+
+void i2c_stop(void)
+{
+	// Send STOP condition
+	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+}
+
+void i2c_write(uint8_t data)
+{
+	TWDR = data;
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)))
+		;
+}
+
+uint8_t i2c_read_ack(void)
+{
+	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA);
+	while (!(TWCR & (1 << TWINT)))
+		;
+	return TWDR;
+}
+
+uint8_t i2c_read_nack(void)
+{
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)))
+		;
+	return TWDR;
+}
+
+void aht20_read_sensor(void)
+{
+	uint8_t status;
+	uint8_t sensor_data[7];
+
+	// Send Measurement Command
 	i2c_start();
-	uint8_t SLA_R = AHT20_ADDRESS << 1 | READ;
-	i2c_write(SLA_R);
-	if (i2c_check_status(TW_MR_SLA_ACK) == false)
-		return;
-	// Reading AHT20 sensor data : 7 bytes
-	uint8_t sensor_data_lenght = 7;
-	uint8_t sensor_data[sensor_data_lenght];
-	for (int i = 0; i < sensor_data_lenght; i++)
+	i2c_write((AHT20_ADDRESS << 1) | WRITE);
+	i2c_write(AHT20_MEASURE_CMD);
+	i2c_write(AHT20_PARAM1);
+	i2c_write(AHT20_PARAM2);
+	i2c_stop();
+
+	// Wait for measurement (≥80ms)
+	_delay_ms(100);
+
+	// Poll Sensor Until Ready
+	do
 	{
-		// Wait for data to be received
-		while (!(TWCR & (1 << TWINT)))
-			;
-		// TODO: Fix stuck inside will look after 6 byte ...
+		i2c_start();
+		i2c_write((AHT20_ADDRESS << 1) | READ);
+		status = i2c_read_nack();
+		i2c_stop();
+		_delay_ms(10);
+	} while (status & (1 << 7)); // Bit 7 should be 0 when data is ready
 
-		// Read data byte
-		sensor_data[i] = TWDR;
-
-#ifdef DEBUG
-		uart_printf("%s %b %s ", ANSI_CYNB, sensor_data[i], ANSI_RESET);
-#endif
-		print_hex_value(sensor_data[i]);
-
-		// Send ACK (for all bytes except the last one)
-		if (i < sensor_data_lenght - 1)
-		{
-			// Send ACK after receiving data
-			TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA);
-		}
-		else
-		{
-			// Send NACK for last byte to indicate end of transfer
-			TWCR = (1 << TWINT) | (1 << TWEN);
-		}
+	// Read 7 Bytes
+	i2c_start();
+	i2c_write((AHT20_ADDRESS << 1) | READ);
+	for (uint8_t i = 0; i < 6; i++)
+	{
+		sensor_data[i] = i2c_read_ack();
+		print_hex_value(sensor_data[i] >> 4);
+		print_hex_value(sensor_data[i] & 0b00001111);
+		uart_printstr(" ");
 	}
+	sensor_data[6] = i2c_read_nack();
+	print_hex_value(sensor_data[6] >> 4);
+	print_hex_value(sensor_data[6] & 0b00001111);
+	uart_printstr("\r\n");
+	i2c_stop();
+
+	// Decode & Print Data
+	// decode_aht20_data(sensor_data);
 }
 
 int main(void)
 {
-	sei();
+	// Initialize UART
 	uart_init(MyUBRR);
+
+	// Initialize I2C
 	i2c_init();
-	// I2C address + write mode (0: write, 1: read)
-	// SLA_W (Slave Address Write) is a specific type of I2C address frame that indicates the master device wants to send data to a slave device
-	uint8_t SLA_W = AHT20_ADDRESS << 1 | WRITE;
+
 	while (1)
 	{
-		i2c_start();
-		// AHT20 trigger measurement data
-		i2c_write(SLA_W);
-		if (i2c_check_status(TW_MT_SLA_ACK) == false)
-			break;
-		i2c_write(AHT20_MEASURE_CMD);
-		if (i2c_check_status(TW_MT_DATA_ACK) == false)
-			break;
-		i2c_write(AHT20_DATA0);
-		if (i2c_check_status(TW_MT_DATA_ACK) == false)
-			break;
-		i2c_write(AHT20_DATA1);
-		if (i2c_check_status(TW_MT_DATA_ACK) == false)
-			break;
-		i2c_stop();
-		// AHT20 measurement delay
-		_delay_ms(80);
-		// Reading AHT20 measurement
-		i2c_read();
-		i2c_stop();
-#ifdef DEBUG
-		uart_printf("\r\n");
-#endif
-		_delay_ms(10000);
-	};
+		aht20_read_sensor();
+		// _delay_ms(2001); // Read every 2 seconds
+		_delay_ms(8000); // Read every 2 seconds
+	}
+
+	return 0;
 }

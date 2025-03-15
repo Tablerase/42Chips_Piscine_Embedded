@@ -1,4 +1,5 @@
 #include "piscine.h"
+#include <stdlib.h>
 
 /**
  * TWI (Two-Wire Serial Interface)
@@ -102,6 +103,61 @@ uint8_t i2c_read_nack(void)
 	return TWDR;
 }
 
+void decode_aht20_data(uint8_t *data)
+{
+	static float humidity_array[2];
+	static float temperature_array[2];
+	static uint8_t count = 0;
+
+	// Extract temperature data (low 20 bytes from 3-5)
+	uint32_t temperature_data = ((uint32_t)data[3] << 16) | ((uint32_t)data[4] << 8) | data[5];
+	temperature_data = (temperature_data & 0xFFFFF); // Keep only the 20 LSB
+
+	// T = (S_t / 2^20) * 200 - 50
+	float temperature = ((float)temperature_data / 1048576.0f) * 200.0f - 50;
+
+	// Extract humidity data (top 20 bits from bytes 1-3)
+	uint32_t humidity_data = ((uint32_t)data[1] << 16) | ((uint32_t)data[2] << 8) | data[3];
+	humidity_data = humidity_data >> 4; // Right shift to get the 20-bit value
+
+	// RH = (S_rh / 2^20) * 100
+	float relative_humidity = ((float)humidity_data / 1048576.0f) * 100.0f;
+
+	if (count >= 2)
+	{
+		count = 0;
+		temperature = (temperature_array[0] + temperature_array[1] + temperature) / 3;
+		relative_humidity = (humidity_array[0] + humidity_array[1] + relative_humidity) / 3;
+
+		// Convert temperature to string
+		char temperature_str[10];
+		dtostrf(temperature, 4, 2, temperature_str);
+		char humidity_str[10];
+		dtostrf(relative_humidity, 4, 2, humidity_str);
+
+		uart_printstr(ANSI_BYEL);
+		uart_printstr("Temperature: ");
+		uart_printstr(ANSI_RESET);
+		uart_printstr(temperature_str);
+		uart_printstr("C, ");
+
+		uart_printstr(ANSI_BBLU);
+		uart_printstr("Humidity: ");
+		uart_printstr(ANSI_RESET);
+		uart_printstr(humidity_str);
+		uart_printstr("%\r\n");
+	}
+	else
+	{
+#ifdef DEBUG
+		uart_printf("Count: %d\r\n", count);
+#endif
+		count = count + 1;
+	}
+	temperature_array[count] = temperature;
+	humidity_array[count] = relative_humidity;
+}
+
 void aht20_read_sensor(void)
 {
 	uint8_t status;
@@ -110,37 +166,9 @@ void aht20_read_sensor(void)
 	// Send Measurement Command
 	i2c_start();
 	i2c_write((AHT20_ADDRESS << 1) | WRITE);
-	if (TW_STATUS != TW_MT_SLA_ACK)
-	{
-#ifdef DEBUG
-		uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-		print_i2c_status(TW_STATUS);
-#endif
-	}
 	i2c_write(AHT20_MEASURE_CMD);
-	if (TW_STATUS != TW_MT_DATA_ACK)
-	{
-#ifdef DEBUG
-		uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-		print_i2c_status(TW_STATUS);
-#endif
-	}
 	i2c_write(AHT20_PARAM1);
-	if (TW_STATUS != TW_MT_DATA_ACK)
-	{
-#ifdef DEBUG
-		uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-		print_i2c_status(TW_STATUS);
-#endif
-	}
 	i2c_write(AHT20_PARAM2);
-	if (TW_STATUS != TW_MT_DATA_ACK)
-	{
-#ifdef DEBUG
-		uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-		print_i2c_status(TW_STATUS);
-#endif
-	}
 	i2c_stop();
 
 	// Wait for measurement (≥80ms)
@@ -151,13 +179,6 @@ void aht20_read_sensor(void)
 	{
 		i2c_start();
 		i2c_write((AHT20_ADDRESS << 1) | READ);
-		if (TW_STATUS != TW_MR_SLA_ACK)
-		{
-#ifdef DEBUG
-			uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-			print_i2c_status(TW_STATUS);
-#endif
-		}
 		status = i2c_read_nack();
 		i2c_stop();
 		_delay_ms(10);
@@ -166,39 +187,15 @@ void aht20_read_sensor(void)
 	// Read 7 Bytes
 	i2c_start();
 	i2c_write((AHT20_ADDRESS << 1) | READ);
-	if (TW_STATUS != TW_MR_SLA_ACK)
-	{
-#ifdef DEBUG
-		uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-		print_i2c_status(TW_STATUS);
-#endif
-	}
 	for (uint8_t i = 0; i < 6; i++)
 	{
 		sensor_data[i] = i2c_read_ack();
-		if (TW_STATUS != TW_MR_DATA_ACK)
-		{
-#ifdef DEBUG
-			uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-			print_i2c_status(TW_STATUS);
-#endif
-		}
-		print_hex_value(sensor_data[i] >> 4);
-		print_hex_value(sensor_data[i] & 0b00001111);
-		uart_printstr(" ");
 	}
 	sensor_data[6] = i2c_read_nack();
-	if (TW_STATUS != TW_MR_DATA_NACK)
-	{
-#ifdef DEBUG
-		uart_printf("%s ERROR %s\r\n", ANSI_WHTB, ANSI_RESET);
-		print_i2c_status(TW_STATUS);
-#endif
-	}
-	print_hex_value(sensor_data[6] >> 4);
-	print_hex_value(sensor_data[6] & 0b00001111);
-	uart_printstr("\r\n");
 	i2c_stop();
+
+	// Decode & Print Data
+	decode_aht20_data(sensor_data);
 }
 
 int main(void)

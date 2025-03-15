@@ -21,6 +21,8 @@
  * Measurement command: 0xAC
  */
 
+// TODO: add uart_printstr in ifndef debug
+
 #define AHT20_ADDRESS 0x38
 #define AHT20_MEASURE_CMD 0xAC
 

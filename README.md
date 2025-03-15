@@ -894,4 +894,7 @@ flowchart LR
 
 <img src="./Media/I2C/AHT20-I2C.png" alt="I2C - AHT20 - Communication" />
 
-- [Example - I2C - AHT20 - AVR](https://www.avrfreaks.net/s/topic/a5C3l000000Bq30EAC/t391353)
+- $RH = (\frac{S_{RH}}{2^{20}}) \times 100 \text{ \%}$
+  - $S_{RH}$: Signal Relative Humidity Value
+- $T = (\frac{S_{T}}{2^{20}}) \times 200 - 50 \text{ °C}$
+  - $S_{T}$: Signal Temperature Value

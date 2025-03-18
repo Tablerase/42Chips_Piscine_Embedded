@@ -209,7 +209,7 @@ int main(void)
 	while (1)
 	{
 		aht20_read_sensor();
-		_delay_ms(2000); // Read every 2 seconds
+		_delay_ms(1000); // Read every 1 seconds
 	}
 
 	return 0;

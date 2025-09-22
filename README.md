@@ -1,5 +1,112 @@
 # 42Chips_Piscine_Embedded
 
+## Demos
+
+<details>
+  <summary>Videos</summary>
+  
+  ### Module 0
+  
+https://github.com/user-attachments/assets/325890b8-ceb9-47ea-9f54-5eef4cc26c7f
+
+https://github.com/user-attachments/assets/be04ae7d-ff0d-448a-a7fb-0e0570d4e0bb
+
+https://github.com/user-attachments/assets/5f5fdadf-7e94-4246-8ccf-f0ef1af19e77
+
+https://github.com/user-attachments/assets/d4ef1134-2ab1-446e-92c2-6f52f7f7dc4f
+
+  ### Module 1
+
+https://github.com/user-attachments/assets/5f0d355c-2910-4b3c-b0f0-31828c4b0394
+
+
+https://github.com/user-attachments/assets/d25b66ca-62ea-4f10-ad16-1b328f6bb9ad
+
+
+https://github.com/user-attachments/assets/223e556b-d993-4c9b-932a-b7eff8345cdf
+
+
+https://github.com/user-attachments/assets/b3814409-27a9-455f-9256-7fcbaa910054
+
+  ### Module 2
+
+
+
+https://github.com/user-attachments/assets/b9d54bda-6438-47ae-bd51-fa96513460f1
+
+
+
+https://github.com/user-attachments/assets/4117c7d1-5756-495a-895d-67f1036b5328
+
+
+
+https://github.com/user-attachments/assets/da8a8327-9bef-4a7c-8479-3e5194c919f5
+
+
+
+https://github.com/user-attachments/assets/7b7c2f7a-a553-4a88-974b-ffa8505b974b
+
+
+
+https://github.com/user-attachments/assets/95f62df8-6c9f-4c32-a4e9-b009c4228b62
+
+  ### Module 3
+
+
+https://github.com/user-attachments/assets/95ad9898-f7c3-4381-afa2-81af43781ec6
+
+
+
+https://github.com/user-attachments/assets/1b726003-d503-408a-81e9-7833ecf4779d
+
+
+
+https://github.com/user-attachments/assets/b984a192-512a-41e3-8178-c43efbff6f13
+
+
+
+https://github.com/user-attachments/assets/ac8ac8fc-9baf-4fba-ac33-d12cdd6bcf6b
+
+  ### Module 4
+
+
+
+https://github.com/user-attachments/assets/dba5c729-f53f-4a22-a9e8-5591b424c486
+
+
+
+https://github.com/user-attachments/assets/97ba8f80-5ee9-4f04-bb1f-0ee419169477
+
+  ### Module 5
+
+https://github.com/user-attachments/assets/f268b1ec-f48d-404b-b7dd-e8991efc632b
+
+
+https://github.com/user-attachments/assets/9ea83631-e08e-46aa-91ee-ac23a1e32cac
+
+
+https://github.com/user-attachments/assets/6953afb6-d99b-4aef-b800-e8022fb23949
+
+
+https://github.com/user-attachments/assets/4cb6c8f7-de16-40af-812c-0c71f3d0ae7e
+
+
+https://github.com/user-attachments/assets/43542f5f-8a1d-47f1-a1a9-b6e7455f35b9
+
+  ### Module 6
+
+https://github.com/user-attachments/assets/19c07fcd-5494-416d-94c8-6fa50efd1941
+
+
+https://github.com/user-attachments/assets/6f6c93b3-71a7-4657-9519-c7e180671e98
+
+
+https://github.com/user-attachments/assets/bba4a182-004e-4e1c-a796-5f04b895814f
+
+
+</details>
+
+
 <img src="https://images.squarespace-cdn.com/content/v1/65d8c36ecf88631d9355461f/5d162657-c8b5-4353-a895-639e3141f510/logo42chips.png" width="200" height="200" align="right" />
 
 ## Resources
